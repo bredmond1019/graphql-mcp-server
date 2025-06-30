@@ -22,15 +22,19 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 
 # Add the MCP server to the path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root / "src"))
 
 try:
-    from healthie_mcp.server import mcp
     from healthie_mcp.schema_manager import SchemaManager
     from healthie_mcp.config.settings import get_settings
+    # Import server module to check it exists
+    import healthie_mcp.server as server_module
+    mcp = getattr(server_module, 'mcp', None)
 except ImportError as e:
     print(f"❌ Failed to import MCP server: {e}")
     print("Make sure you're running from the correct directory and dependencies are installed.")
+    print("Try: uv sync")
     sys.exit(1)
 
 
@@ -57,17 +61,49 @@ class MCPTester:
         try:
             self.log("Testing server import...")
             
-            # Check if server object exists
-            if not hasattr(mcp, '_tools'):
-                self.log("MCP server not properly initialized", "error")
+            # Check if server module exists and mcp object is available
+            if mcp is None:
+                self.log("MCP server object not found", "error")
                 return False
             
-            tools = getattr(mcp, '_tools', {})
-            self.log(f"Found {len(tools)} registered tools")
-            
+            # Debug: Show all attributes of the mcp object
             if self.verbose:
-                for tool_name in tools.keys():
-                    self.log(f"  - {tool_name}")
+                attrs = [attr for attr in dir(mcp) if not attr.startswith('__')]
+                self.log(f"MCP object attributes: {', '.join(attrs[:10])}...")
+            
+            # Check if server has tools - FastMCP uses different attribute names
+            tools_attr = None
+            possible_attrs = ['_tools', 'tools', '_handlers', '_tool_handlers', 'tool_list']
+            for attr in possible_attrs:
+                if hasattr(mcp, attr):
+                    attr_value = getattr(mcp, attr)
+                    if isinstance(attr_value, dict) and attr_value:
+                        tools_attr = attr
+                        break
+                    elif hasattr(attr_value, '__len__') and len(attr_value) > 0:
+                        tools_attr = attr
+                        break
+            
+            if tools_attr is None:
+                self.log("MCP server tools not found", "error")
+                if self.verbose:
+                    # Try to find any callable attributes that might be tools
+                    callables = [attr for attr in dir(mcp) if callable(getattr(mcp, attr, None)) and not attr.startswith('_')]
+                    self.log(f"Callable methods: {', '.join(callables[:5])}...")
+                return False
+            
+            tools = getattr(mcp, tools_attr, {})
+            if isinstance(tools, dict):
+                self.log(f"Found {len(tools)} registered tools using '{tools_attr}'")
+                if self.verbose:
+                    for tool_name in tools.keys():
+                        self.log(f"  - {tool_name}")
+            else:
+                self.log(f"Found tools in '{tools_attr}' (length: {len(tools)})")
+                if self.verbose and hasattr(tools, '__iter__'):
+                    for i, tool in enumerate(tools):
+                        if i < 5:  # Show first 5
+                            self.log(f"  - {getattr(tool, 'name', f'tool_{i}')}")
             
             self.results['server_import'] = True
             self.log("Server import successful", "success")
@@ -86,12 +122,12 @@ class MCPTester:
             settings = get_settings()
             
             # Check required settings
-            if not settings.api_url:
+            if not settings.healthie_api_url:
                 self.log("API URL not configured", "warning")
             else:
-                self.log(f"API URL: {settings.api_url}")
+                self.log(f"API URL: {settings.healthie_api_url}")
             
-            if not settings.api_key:
+            if not settings.healthie_api_key:
                 self.log("API key not configured (optional for some tools)", "warning")
             else:
                 self.log("API key configured ✓")
@@ -116,12 +152,12 @@ class MCPTester:
             
             settings = get_settings()
             schema_manager = SchemaManager(
-                api_endpoint=settings.api_url,
+                api_endpoint=str(settings.healthie_api_url),
                 cache_dir=Path(settings.schema_dir)
             )
             
             # Test schema loading (if API key available)
-            if settings.api_key:
+            if settings.healthie_api_key:
                 try:
                     schema_content = schema_manager.get_schema_content()
                     if schema_content:
@@ -150,7 +186,17 @@ class MCPTester:
             self.log(f"Testing tool: {tool_name}")
             
             # Get the tool function from the server
-            tools = getattr(mcp, '_tools', {})
+            tools_attr = None
+            for attr in ['_tools', 'tools', '_handlers']:
+                if hasattr(mcp, attr):
+                    tools_attr = attr
+                    break
+            
+            if tools_attr is None:
+                self.log(f"No tools found on server", "error")
+                return False
+            
+            tools = getattr(mcp, tools_attr, {})
             if tool_name not in tools:
                 self.log(f"Tool {tool_name} not found", "error")
                 return False
@@ -280,7 +326,18 @@ class MCPTester:
         """Test all available tools"""
         self.log("Testing all tools...")
         
-        tools = getattr(mcp, '_tools', {})
+        # Get tools using the same logic
+        tools_attr = None
+        for attr in ['_tools', 'tools', '_handlers']:
+            if hasattr(mcp, attr):
+                tools_attr = attr
+                break
+        
+        if tools_attr is None:
+            self.log("No tools found on server", "error")
+            return {}
+        
+        tools = getattr(mcp, tools_attr, {})
         results = {}
         
         for tool_name in tools.keys():

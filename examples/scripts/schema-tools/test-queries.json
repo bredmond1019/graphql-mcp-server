@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Get Patient",
+    "query": "query GetPatient($id: ID!) { patient(id: $id) { id firstName lastName email } }"
+  },
+  {
+    "name": "Create Patient",
+    "query": "mutation CreatePatient($input: CreatePatientInput!) { createPatient(input: $input) { patient { id email } errors } }"
+  },
+  {
+    "name": "Search Patients",
+    "query": "query SearchPatients($criteria: PatientSearchInput!) { searchPatients(criteria: $criteria) { id firstName lastName email } }"
+  },
+  {
+    "name": "Invalid Syntax Query",
+    "query": "query { patient { id name }"
+  }
+]

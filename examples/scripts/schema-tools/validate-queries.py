@@ -21,11 +21,11 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional, Union
 
 # Add the MCP server to the path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root / "src"))
 
 try:
     from graphql import build_schema, validate, parse, GraphQLError
-    from graphql.validation import get_validation_rules
     from healthie_mcp.schema_manager import SchemaManager
     from healthie_mcp.config.settings import get_settings
 except ImportError as e:
@@ -48,7 +48,7 @@ class QueryValidator:
         try:
             settings = get_settings()
             schema_manager = SchemaManager(
-                api_endpoint=settings.api_url,
+                api_endpoint=str(settings.healthie_api_url),
                 cache_dir=Path(settings.schema_dir)
             )
             

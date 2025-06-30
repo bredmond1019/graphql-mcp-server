@@ -1,0 +1,288 @@
+# Webhook Configurator Configuration for Healthie MCP Server
+# This file contains webhook configuration templates, validation rules, and healthcare-specific settings
+
+# Webhook Event Definitions
+webhook_events:
+  patient_management:
+    events:
+      - patient_created
+      - patient_updated
+      - document_uploaded
+      - form_submitted
+    description: "Events related to patient data and document management"
+    use_cases:
+      - "Real-time patient record updates in external systems"
+      - "Document processing workflows"
+      - "Patient onboarding automation"
+      - "Compliance and audit trail maintenance"
+    
+  appointment_scheduling:
+    events:
+      - appointment_created
+      - appointment_updated
+      - appointment_cancelled
+    description: "Events related to appointment lifecycle"
+    use_cases:
+      - "Calendar synchronization with external systems"
+      - "Automated reminder and notification systems"
+      - "Resource scheduling and optimization"
+      - "Provider schedule management"
+    
+  clinical_workflows:
+    events:
+      - form_submitted
+      - care_plan_updated
+      - task_completed
+    description: "Events related to clinical care and documentation"
+    use_cases:
+      - "Clinical decision support systems"
+      - "Care coordination platforms"
+      - "Quality measure tracking"
+      - "Treatment outcome monitoring"
+    
+  billing_and_payments:
+    events:
+      - payment_completed
+      - payment_failed
+    description: "Events related to financial transactions"
+    use_cases:
+      - "Revenue cycle management"
+      - "Insurance claim processing"
+      - "Payment reconciliation"
+      - "Financial reporting and analytics"
+    
+  communication:
+    events:
+      - chat_message_created
+    description: "Events related to patient-provider communication"
+    use_cases:
+      - "Message routing and escalation"
+      - "Communication audit trails"
+      - "Automated response systems"
+      - "Multi-channel communication integration"
+
+# Security Configuration Templates
+security_templates:
+  basic:
+    name: "Basic Security"
+    description: "Suitable for development and testing environments"
+    features:
+      - "HMAC-SHA256 signature verification"
+      - "10-minute timestamp tolerance"
+      - "Basic header validation"
+    configuration:
+      timestamp_tolerance_seconds: 600
+      required_headers: []
+      signature_algorithm: "sha256"
+      
+  standard:
+    name: "Standard Security"
+    description: "Recommended for most production environments"
+    features:
+      - "HMAC-SHA256 signature verification"
+      - "5-minute timestamp tolerance"
+      - "Required delivery headers"
+      - "User agent validation"
+    configuration:
+      timestamp_tolerance_seconds: 300
+      required_headers:
+        - "X-Healthie-Event"
+        - "X-Healthie-Delivery"
+      signature_algorithm: "sha256"
+      user_agent_pattern: "Healthie-Webhook/\\d+\\.\\d+"
+      
+  enhanced:
+    name: "Enhanced Security"
+    description: "Additional security measures for sensitive environments"
+    features:
+      - "HMAC-SHA256 signature verification"
+      - "3-minute timestamp tolerance"
+      - "Enhanced header validation"
+      - "User agent pattern matching"
+      - "Request rate limiting consideration"
+    configuration:
+      timestamp_tolerance_seconds: 180
+      required_headers:
+        - "X-Healthie-Event"
+        - "X-Healthie-Delivery"
+        - "X-Healthie-Environment"
+      signature_algorithm: "sha256"
+      user_agent_pattern: "Healthie-Webhook/\\d+\\.\\d+"
+      
+  hipaa_compliant:
+    name: "HIPAA-Compliant Security"
+    description: "Comprehensive security for healthcare environments"
+    features:
+      - "HMAC-SHA256 signature verification"
+      - "2-minute timestamp tolerance"
+      - "Comprehensive header validation"
+      - "IP address whitelisting"
+      - "Enhanced audit requirements"
+      - "Data encryption recommendations"
+    configuration:
+      timestamp_tolerance_seconds: 120
+      required_headers:
+        - "X-Healthie-Event"
+        - "X-Healthie-Delivery"
+        - "X-Healthie-Environment"
+        - "X-Healthie-Audit-ID"
+      signature_algorithm: "sha256"
+      user_agent_pattern: "Healthie-Webhook/\\d+\\.\\d+"
+      ip_whitelist_required: true
+      audit_logging_required: true
+    compliance_notes:
+      - "Implement comprehensive audit logging for all webhook receipts"
+      - "Encrypt webhook data at rest if storing for processing"
+      - "Ensure webhook processing follows HIPAA security requirements"
+      - "Regular security assessments and penetration testing recommended"
+      - "Business Associate Agreement (BAA) may be required"
+
+# Payload Examples and Templates
+payload_examples:
+  patient_created:
+    description: "Webhook payload when a new patient is created"
+    headers:
+      Content-Type: "application/json"
+      X-Healthie-Signature: "sha256=example_signature_hash"
+      X-Healthie-Timestamp: "2024-07-01T12:00:00Z"
+      X-Healthie-Event: "patient_created"
+      X-Healthie-Delivery: "delivery_unique_id"
+    payload:
+      event: "patient_created"
+      patient_id: "pat_example123"
+      timestamp: "2024-07-01T12:00:00Z"
+      data:
+        id: "pat_example123"
+        first_name: "John"
+        last_name: "Doe"
+        email: "john.doe@example.com"
+        phone: "+1-555-0123"
+        date_of_birth: "1990-01-15"
+        created_at: "2024-07-01T12:00:00Z"
+        tags: ["new_patient", "high_priority"]
+        
+  appointment_created:
+    description: "Webhook payload when a new appointment is scheduled"
+    headers:
+      Content-Type: "application/json"
+      X-Healthie-Signature: "sha256=example_signature_hash"
+      X-Healthie-Timestamp: "2024-07-01T12:00:00Z"
+      X-Healthie-Event: "appointment_created"
+      X-Healthie-Delivery: "delivery_unique_id"
+    payload:
+      event: "appointment_created"
+      appointment_id: "apt_example456"
+      timestamp: "2024-07-01T12:00:00Z"
+      data:
+        id: "apt_example456"
+        patient_id: "pat_example123"
+        provider_id: "prov_example789"
+        start_time: "2024-07-08T10:00:00Z"
+        end_time: "2024-07-08T11:00:00Z"
+        status: "scheduled"
+        appointment_type: "consultation"
+        location_id: "loc_example001"
+        created_at: "2024-07-01T12:00:00Z"
+
+# Validation Rules and Best Practices
+validation_rules:
+  endpoint_requirements:
+    - "Endpoint must use HTTPS in production environments"
+    - "Endpoint should return 2xx status codes for successful webhook receipt"
+    - "Endpoint should respond within 30 seconds to prevent timeouts"
+    - "Endpoint should handle duplicate deliveries idempotently"
+    
+  security_requirements:
+    - "Always verify webhook signatures using HMAC-SHA256"
+    - "Validate timestamp to prevent replay attacks"
+    - "Log all webhook receipts for audit purposes"
+    - "Implement proper error handling and retry logic"
+    
+  hipaa_specific:
+    - "Encrypt webhook payloads containing PHI at rest"
+    - "Implement access controls for webhook processing systems"
+    - "Maintain comprehensive audit logs with data access tracking"
+    - "Ensure webhook endpoints are within secure network perimeters"
+    - "Regular vulnerability assessments for webhook infrastructure"
+
+# Error Handling and Retry Configuration
+retry_policies:
+  default:
+    max_retries: 3
+    initial_delay_seconds: 5
+    max_delay_seconds: 300
+    exponential_backoff: true
+    retry_on_status_codes: [408, 429, 500, 502, 503, 504]
+    
+  aggressive:
+    max_retries: 5
+    initial_delay_seconds: 2
+    max_delay_seconds: 600
+    exponential_backoff: true
+    jitter: true
+    retry_on_status_codes: [408, 413, 429, 500, 502, 503, 504]
+    
+  conservative:
+    max_retries: 2
+    initial_delay_seconds: 10
+    max_delay_seconds: 120
+    exponential_backoff: false
+    retry_on_status_codes: [500, 502, 503, 504]
+
+# Healthcare-Specific Filtering Options
+filtering_options:
+  patient_based:
+    description: "Filter events by patient attributes"
+    options:
+      - patient_tags: "Filter by patient tags (e.g., 'high_priority', 'new_patient')"
+      - patient_demographics: "Filter by age groups, gender, or location"
+      - care_team: "Filter by assigned care team or provider"
+      
+  clinical_based:
+    description: "Filter events by clinical context"
+    options:
+      - appointment_types: "Filter by specific appointment types"
+      - form_types: "Filter by clinical form types"
+      - care_plan_status: "Filter by care plan stages or status"
+      
+  operational_based:
+    description: "Filter events by operational criteria"
+    options:
+      - location_ids: "Filter by specific practice locations"
+      - provider_ids: "Filter by specific healthcare providers"
+      - time_ranges: "Filter by business hours or date ranges"
+
+# Integration Patterns and Recommendations
+integration_patterns:
+  real_time_sync:
+    description: "Immediate synchronization with external systems"
+    use_cases:
+      - "EMR integration for patient record updates"
+      - "Calendar synchronization with practice management systems"
+      - "Real-time notification systems"
+    recommendations:
+      - "Use minimal retry delays for immediate processing"
+      - "Implement circuit breakers for downstream system failures"
+      - "Monitor webhook delivery success rates closely"
+      
+  batch_processing:
+    description: "Collect and process webhooks in batches"
+    use_cases:
+      - "Data warehouse updates"
+      - "Bulk reporting and analytics"
+      - "Non-urgent workflow automation"
+    recommendations:
+      - "Implement message queuing for webhook collection"
+      - "Process webhooks during off-peak hours when possible"
+      - "Use longer retry policies for batch processing"
+      
+  audit_and_compliance:
+    description: "Focused on maintaining audit trails and compliance"
+    use_cases:
+      - "Regulatory reporting requirements"
+      - "Quality assurance programs"
+      - "Risk management systems"
+    recommendations:
+      - "Enable comprehensive logging for all webhook events"
+      - "Implement data retention policies per regulatory requirements"
+      - "Regular compliance audits of webhook processing systems"

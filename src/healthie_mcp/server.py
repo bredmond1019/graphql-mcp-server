@@ -18,6 +18,8 @@ from .tools.code_examples import setup_code_example_tool
 from .tools.error_decoder import setup_error_decoder_tool
 from .tools.workflow_sequences import setup_workflow_sequence_tool
 from .tools.field_usage import setup_field_usage_tool
+from .tools.integration_testing import setup_integration_testing_tool
+from .tools.webhook_configurator import setup_webhook_configurator_tool
 
 # Create the FastMCP server
 mcp = FastMCP("Healthie Development Assistant")
@@ -43,6 +45,8 @@ setup_code_example_tool(mcp, schema_manager)
 setup_error_decoder_tool(mcp, schema_manager)
 setup_workflow_sequence_tool(mcp, schema_manager)
 setup_field_usage_tool(mcp, schema_manager)
+setup_integration_testing_tool(mcp, schema_manager)
+setup_webhook_configurator_tool(mcp, schema_manager)
 
 @mcp.resource("healthie://schema/current")
 def get_current_schema() -> str:

@@ -1,0 +1,99 @@
+# Integration Testing Configuration
+# Configuration for the integration testing MCP tool
+
+environments:
+  staging:
+    api_url: "https://staging-api.gethealthie.com/graphql"
+    description: "Staging environment for safe testing"
+    allow_mutations: true
+    safety_level: "medium"
+  
+  production:
+    api_url: "https://api.gethealthie.com/graphql"
+    description: "Production environment - mutations require extra caution"
+    allow_mutations: false  # Default to false for safety
+    safety_level: "high"
+
+# Performance thresholds in milliseconds
+performance:
+  fast_threshold: 500
+  acceptable_threshold: 1500
+  slow_threshold: 3000
+  timeout: 30000
+
+# Test categories and their default settings
+test_categories:
+  authentication:
+    enabled: true
+    required: true
+    description: "Validate API authentication setup"
+  
+  queries:
+    enabled: true
+    required: false
+    description: "Test basic GraphQL query execution"
+    
+  mutations:
+    enabled: false  # Disabled by default for safety
+    required: false
+    description: "Test GraphQL mutations (with safety checks)"
+    
+  error_handling:
+    enabled: true
+    required: false
+    description: "Validate API error responses and handling"
+    
+  performance:
+    enabled: true
+    required: false
+    description: "Measure and validate API response times"
+    
+  security:
+    enabled: false
+    required: false
+    description: "Security-focused testing (future enhancement)"
+
+# Safety rules for mutation testing
+mutation_safety:
+  production_allowed: false
+  require_explicit_consent: true
+  dry_run_mode: true
+  test_queries:
+    - "{ __schema { queryType { name } } }"  # Safe introspection
+  
+# Recommended test sequences
+test_sequences:
+  basic:
+    - "authentication"
+    - "queries"
+    - "error_handling"
+    
+  comprehensive:
+    - "authentication"
+    - "queries"
+    - "error_handling"
+    - "performance"
+    - "mutations"  # Only if explicitly enabled
+    
+  performance_focused:
+    - "authentication"
+    - "performance"
+
+# Error handling test scenarios
+error_scenarios:
+  invalid_query:
+    query: "{ invalidField { nonExistentField } }"
+    expected_status: [400, 200]  # 400 for HTTP error, 200 with GraphQL errors
+    description: "Test invalid query handling"
+  
+  malformed_syntax:
+    query: "{ invalid syntax }"
+    expected_status: [400]
+    description: "Test malformed GraphQL syntax handling"
+
+# Reporting configuration
+reporting:
+  include_timing: true
+  include_recommendations: true
+  summary_level: "detailed"
+  export_formats: ["json", "text"]

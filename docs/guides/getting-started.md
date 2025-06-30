@@ -209,11 +209,11 @@ input_validation field_type="medical_identifiers"
 ### For Backend Developers  
 1. Check out [API integration examples](../../examples/integrations/python/)
 2. Learn about [error handling patterns](../api/error-handling.md)
-3. See [performance optimization guide](../api/configuration.md)
+3. See [configuration guide](../api/configuration.md)
 
 ### For Healthcare Teams
 1. Review [healthcare-specific workflows](./healthcare-workflows.md)
-2. Understand [compliance considerations](../api/configuration.md#security)
+2. Understand [compliance considerations](../api/configuration.md)
 3. Explore [clinical data patterns](../tutorials/clinical-integration.md)
 
 ## 💡 Pro Tips

@@ -1,0 +1,212 @@
+# Workflow Sequences Configuration for Healthie MCP Server
+# This file contains multi-step workflow definitions for common healthcare operations
+
+patient_management:
+  - workflow_name: "Complete Patient Onboarding"
+    description: "Full patient registration process including demographics, insurance, and initial forms"
+    steps:
+      - step_number: 1
+        operation_type: "mutation"
+        operation_name: "createClient"
+        description: "Create the patient record with basic demographics"
+        required_inputs:
+          - firstName
+          - lastName
+          - email
+          - phone
+        expected_outputs:
+          - client.id
+          - client.email
+        graphql_example: |
+          mutation CreatePatient($input: CreateClientInput!) {
+            createClient(input: $input) {
+              client {
+                id
+                firstName
+                lastName
+                email
+              }
+              errors { field message }
+            }
+          }
+        notes: "Save the client.id for subsequent steps"
+        
+      - step_number: 2
+        operation_type: "mutation"
+        operation_name: "updateClientInsurance"
+        description: "Add insurance information for the patient"
+        required_inputs:
+          - clientId
+          - insuranceInfo
+        expected_outputs:
+          - insurance.id
+          - insurance.status
+        graphql_example: |
+          mutation UpdateInsurance($input: UpdateInsuranceInput!) {
+            updateClientInsurance(input: $input) {
+              insurance {
+                id
+                name
+                memberNumber
+                status
+              }
+              errors { field message }
+            }
+          }
+        depends_on: [1]
+        notes: "Insurance verification may take additional time"
+        
+      - step_number: 3
+        operation_type: "query"
+        operation_name: "getRequiredForms"
+        description: "Get list of required intake forms for the patient"
+        required_inputs:
+          - clientId
+        expected_outputs:
+          - forms.id
+          - forms.name
+          - forms.required
+        graphql_example: |
+          query GetRequiredForms($clientId: ID!) {
+            client(id: $clientId) {
+              requiredForms {
+                id
+                name
+                formType
+                required
+              }
+            }
+          }
+        depends_on: [1]
+        
+      - step_number: 4
+        operation_type: "mutation"
+        operation_name: "submitIntakeForm"
+        description: "Submit completed intake forms"
+        required_inputs:
+          - clientId
+          - formId
+          - responses
+        expected_outputs:
+          - form.status
+          - form.submittedAt
+        graphql_example: |
+          mutation SubmitForm($input: SubmitFormInput!) {
+            submitForm(input: $input) {
+              form {
+                id
+                status
+                submittedAt
+              }
+              errors { field message }
+            }
+          }
+        depends_on: [3]
+        notes: "Repeat for each required form"
+        
+    total_steps: 4
+    estimated_duration: "5-10 minutes"
+    prerequisites:
+      - "Valid API key"
+      - "Organization setup"
+    notes: "Complete this workflow before scheduling appointments"
+
+appointments:
+  - workflow_name: "Book Appointment with Verification"
+    description: "Complete appointment booking process with availability check and confirmation"
+    steps:
+      - step_number: 1
+        operation_type: "query"
+        operation_name: "getProviderAvailability"
+        description: "Check provider availability for the requested time period"
+        required_inputs:
+          - providerId
+          - startDate
+          - endDate
+        expected_outputs:
+          - availableSlots
+        graphql_example: |
+          query GetAvailability($providerId: ID!, $startDate: Date!, $endDate: Date!) {
+            provider(id: $providerId) {
+              availableSlots(startDate: $startDate, endDate: $endDate) {
+                startTime
+                endTime
+                isAvailable
+              }
+            }
+          }
+          
+      - step_number: 2
+        operation_type: "mutation"
+        operation_name: "createAppointment"
+        description: "Create the appointment booking"
+        required_inputs:
+          - clientId
+          - providerId
+          - startTime
+          - endTime
+        expected_outputs:
+          - appointment.id
+          - appointment.status
+        graphql_example: |
+          mutation BookAppointment($input: CreateAppointmentInput!) {
+            createAppointment(input: $input) {
+              appointment {
+                id
+                startTime
+                endTime
+                status
+              }
+              errors { field message }
+            }
+          }
+        depends_on: [1]
+        
+      - step_number: 3
+        operation_type: "mutation"
+        operation_name: "sendAppointmentConfirmation"
+        description: "Send confirmation email/SMS to patient"
+        required_inputs:
+          - appointmentId
+        expected_outputs:
+          - confirmation.sent
+          - confirmation.method
+        graphql_example: |
+          mutation SendConfirmation($appointmentId: ID!) {
+            sendAppointmentConfirmation(appointmentId: $appointmentId) {
+              sent
+              method
+              errors { field message }
+            }
+          }
+        depends_on: [2]
+        notes: "Configure notification preferences in organization settings"
+        
+    total_steps: 3
+    estimated_duration: "2-3 minutes"
+    prerequisites:
+      - "Valid provider ID"
+      - "Patient record exists"
+    notes: "Check timezone settings for appointment times"
+
+# Workflow best practices
+best_practices:
+  error_handling:
+    - "Check for errors after each mutation"
+    - "Implement retry logic for transient failures"
+    - "Log all error responses for debugging"
+    
+  performance:
+    - "Batch related queries when possible"
+    - "Use field selection to minimize data transfer"
+    - "Implement pagination for large result sets"
+    
+  data_validation:
+    - "Validate all inputs before submission"
+    - "Check required fields based on organization settings"
+    - "Verify data formats (dates, phone numbers, etc.)"
+    
+  security:
+    - "Never expose API keys in client-side code"
+    - "Implement proper authentication for each request"
+    - "Follow HIPAA guidelines for PHI handling"

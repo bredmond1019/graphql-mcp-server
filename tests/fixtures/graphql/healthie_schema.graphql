@@ -1,0 +1,490 @@
+"""
+Complete Healthie GraphQL schema fixture for testing.
+This is a simplified version of the actual Healthie schema.
+"""
+
+type Query {
+  # User queries
+  me: User
+  user(id: ID!): User
+  users(first: Int, after: String): UserConnection
+  
+  # Patient queries
+  patient(id: ID!): Patient
+  patients(first: Int, after: String, filters: PatientFilters): PatientConnection
+  
+  # Appointment queries
+  appointment(id: ID!): Appointment
+  appointments(first: Int, after: String, filters: AppointmentFilters): AppointmentConnection
+  
+  # Form queries
+  form(id: ID!): Form
+  forms(first: Int, after: String): FormConnection
+  
+  # Organization queries
+  organization(id: ID!): Organization
+  
+  # Search functionality
+  search(query: String!, types: [SearchType!]): SearchResults
+}
+
+type Mutation {
+  # User mutations
+  updateUser(input: UpdateUserInput!): UpdateUserPayload
+  
+  # Patient mutations
+  createPatient(input: CreatePatientInput!): CreatePatientPayload
+  updatePatient(input: UpdatePatientInput!): UpdatePatientPayload
+  deletePatient(id: ID!): DeletePatientPayload
+  
+  # Appointment mutations
+  createAppointment(input: CreateAppointmentInput!): CreateAppointmentPayload
+  updateAppointment(input: UpdateAppointmentInput!): UpdateAppointmentPayload
+  cancelAppointment(id: ID!): CancelAppointmentPayload
+  
+  # Form mutations
+  createForm(input: CreateFormInput!): CreateFormPayload
+  updateForm(input: UpdateFormInput!): UpdateFormPayload
+  submitFormCompletion(input: SubmitFormCompletionInput!): SubmitFormCompletionPayload
+}
+
+# User types
+type User {
+  id: ID!
+  email: String!
+  firstName: String
+  lastName: String
+  fullName: String
+  role: UserRole!
+  organization: Organization
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  isActive: Boolean!
+  timezone: String
+  phoneNumber: String
+  avatar: String
+}
+
+enum UserRole {
+  ADMIN
+  PROVIDER
+  PATIENT
+  STAFF
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+# Patient types
+type Patient {
+  id: ID!
+  email: String
+  firstName: String!
+  lastName: String!
+  fullName: String!
+  dateOfBirth: Date
+  phoneNumber: String
+  address: Address
+  organization: Organization!
+  provider: User
+  appointments: AppointmentConnection
+  forms: FormConnection
+  tags: [String!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  isActive: Boolean!
+  notes: String
+  emergencyContact: EmergencyContact
+}
+
+type PatientConnection {
+  edges: [PatientEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type PatientEdge {
+  node: Patient!
+  cursor: String!
+}
+
+input PatientFilters {
+  isActive: Boolean
+  provider: ID
+  tags: [String!]
+  createdAfter: DateTime
+  createdBefore: DateTime
+}
+
+# Appointment types
+type Appointment {
+  id: ID!
+  title: String!
+  description: String
+  startTime: DateTime!
+  endTime: DateTime!
+  status: AppointmentStatus!
+  type: AppointmentType
+  patient: Patient!
+  provider: User!
+  organization: Organization!
+  location: String
+  isVirtual: Boolean!
+  meetingLink: String
+  notes: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+type AppointmentType {
+  id: ID!
+  name: String!
+  duration: Int!
+  color: String
+  isActive: Boolean!
+}
+
+type AppointmentConnection {
+  edges: [AppointmentEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type AppointmentEdge {
+  node: Appointment!
+  cursor: String!
+}
+
+input AppointmentFilters {
+  status: AppointmentStatus
+  provider: ID
+  patient: ID
+  startDate: Date
+  endDate: Date
+  isVirtual: Boolean
+}
+
+# Form types
+type Form {
+  id: ID!
+  title: String!
+  description: String
+  status: FormStatus!
+  formSections: [FormSection!]!
+  organization: Organization!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum FormStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+type FormSection {
+  id: ID!
+  title: String!
+  description: String
+  position: Int!
+  formQuestions: [FormQuestion!]!
+}
+
+type FormQuestion {
+  id: ID!
+  question: String!
+  questionType: QuestionType!
+  isRequired: Boolean!
+  position: Int!
+  options: [String!]
+  placeholder: String
+}
+
+enum QuestionType {
+  TEXT
+  TEXTAREA
+  EMAIL
+  PHONE
+  NUMBER
+  DATE
+  BOOLEAN
+  SELECT
+  MULTI_SELECT
+  RADIO
+  CHECKBOX
+  FILE_UPLOAD
+}
+
+type FormConnection {
+  edges: [FormEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type FormEdge {
+  node: Form!
+  cursor: String!
+}
+
+# Organization types
+type Organization {
+  id: ID!
+  name: String!
+  subdomain: String!
+  logo: String
+  address: Address
+  phoneNumber: String
+  email: String
+  website: String
+  timezone: String!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Common types
+type Address {
+  street1: String
+  street2: String
+  city: String
+  state: String
+  zipCode: String
+  country: String
+}
+
+type EmergencyContact {
+  name: String!
+  relationship: String
+  phoneNumber: String!
+  email: String
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+# Search types
+union SearchResults = User | Patient | Appointment | Form
+
+enum SearchType {
+  USER
+  PATIENT
+  APPOINTMENT
+  FORM
+}
+
+# Input types for mutations
+input UpdateUserInput {
+  id: ID!
+  firstName: String
+  lastName: String
+  email: String
+  phoneNumber: String
+  timezone: String
+}
+
+input CreatePatientInput {
+  firstName: String!
+  lastName: String!
+  email: String
+  phoneNumber: String
+  dateOfBirth: Date
+  address: AddressInput
+  provider: ID
+  tags: [String!]
+  notes: String
+  emergencyContact: EmergencyContactInput
+}
+
+input UpdatePatientInput {
+  id: ID!
+  firstName: String
+  lastName: String
+  email: String
+  phoneNumber: String
+  dateOfBirth: Date
+  address: AddressInput
+  provider: ID
+  tags: [String!]
+  notes: String
+  emergencyContact: EmergencyContactInput
+  isActive: Boolean
+}
+
+input CreateAppointmentInput {
+  title: String!
+  description: String
+  startTime: DateTime!
+  endTime: DateTime!
+  patient: ID!
+  provider: ID!
+  type: ID
+  location: String
+  isVirtual: Boolean
+  meetingLink: String
+  notes: String
+}
+
+input UpdateAppointmentInput {
+  id: ID!
+  title: String
+  description: String
+  startTime: DateTime
+  endTime: DateTime
+  status: AppointmentStatus
+  type: ID
+  location: String
+  isVirtual: Boolean
+  meetingLink: String
+  notes: String
+}
+
+input CreateFormInput {
+  title: String!
+  description: String
+  formSections: [FormSectionInput!]!
+}
+
+input UpdateFormInput {
+  id: ID!
+  title: String
+  description: String
+  status: FormStatus
+  formSections: [FormSectionInput!]
+  isActive: Boolean
+}
+
+input SubmitFormCompletionInput {
+  formId: ID!
+  patientId: ID!
+  responses: [FormResponseInput!]!
+}
+
+input FormSectionInput {
+  id: ID
+  title: String!
+  description: String
+  position: Int!
+  formQuestions: [FormQuestionInput!]!
+}
+
+input FormQuestionInput {
+  id: ID
+  question: String!
+  questionType: QuestionType!
+  isRequired: Boolean!
+  position: Int!
+  options: [String!]
+  placeholder: String
+}
+
+input FormResponseInput {
+  questionId: ID!
+  value: String!
+}
+
+input AddressInput {
+  street1: String
+  street2: String
+  city: String
+  state: String
+  zipCode: String
+  country: String
+}
+
+input EmergencyContactInput {
+  name: String!
+  relationship: String
+  phoneNumber: String!
+  email: String
+}
+
+# Payload types for mutations
+type UpdateUserPayload {
+  user: User
+  errors: [String!]
+}
+
+type CreatePatientPayload {
+  patient: Patient
+  errors: [String!]
+}
+
+type UpdatePatientPayload {
+  patient: Patient
+  errors: [String!]
+}
+
+type DeletePatientPayload {
+  deletedPatientId: ID
+  errors: [String!]
+}
+
+type CreateAppointmentPayload {
+  appointment: Appointment
+  errors: [String!]
+}
+
+type UpdateAppointmentPayload {
+  appointment: Appointment
+  errors: [String!]
+}
+
+type CancelAppointmentPayload {
+  appointment: Appointment
+  errors: [String!]
+}
+
+type CreateFormPayload {
+  form: Form
+  errors: [String!]
+}
+
+type UpdateFormPayload {
+  form: Form
+  errors: [String!]
+}
+
+type SubmitFormCompletionPayload {
+  formCompletion: FormCompletion
+  errors: [String!]
+}
+
+type FormCompletion {
+  id: ID!
+  form: Form!
+  patient: Patient!
+  responses: [FormResponse!]!
+  submittedAt: DateTime!
+}
+
+type FormResponse {
+  id: ID!
+  question: FormQuestion!
+  value: String!
+}
+
+# Scalar types
+scalar DateTime
+scalar Date

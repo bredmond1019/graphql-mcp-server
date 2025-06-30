@@ -1,0 +1,153 @@
+# Error Definitions and Solutions for Healthie MCP Server
+# This file contains error patterns, explanations, and solutions
+
+error_types:
+  authentication:
+    patterns:
+      - "unauthorized"
+      - "authentication"
+      - "invalid api key"
+      - "missing api key"
+    explanation: "The API key is missing, invalid, or has expired"
+    solutions:
+      - problem: "Invalid or missing API key"
+        solution: "Check that your HEALTHIE_API_KEY environment variable is set correctly"
+        code_example: 'headers: { "Authorization": "Bearer your-api-key-here" }'
+      - problem: "Expired API key"
+        solution: "Generate a new API key from your Healthie dashboard"
+        documentation_link: "https://docs.gethealthie.com/authentication"
+
+  validation:
+    patterns:
+      - "validation"
+      - "invalid"
+      - "must be"
+      - "required"
+      - "format"
+    explanation: "The input data doesn't meet the API's validation requirements"
+    field_specific:
+      email:
+        problem: "Invalid email format"
+        solution: "Ensure email addresses follow the format user@domain.com"
+        code_example: '"email": "patient@example.com"'
+      phone:
+        problem: "Invalid phone number format"
+        solution: "Use international format with country code"
+        code_example: '"phone": "+1234567890"'
+      date:
+        problem: "Invalid date format"
+        solution: "Use ISO 8601 date format (YYYY-MM-DD)"
+        code_example: '"dateOfBirth": "1990-01-01"'
+      datetime:
+        problem: "Invalid datetime format"
+        solution: "Use ISO 8601 datetime format with timezone"
+        code_example: '"startTime": "2024-01-01T10:00:00Z"'
+    general_solutions:
+      - problem: "Missing required fields"
+        solution: "Check the API documentation for required fields and include them in your request"
+        code_example: "Ensure all fields marked with '!' in the schema are provided"
+
+  authorization:
+    patterns:
+      - "permission"
+      - "forbidden"
+      - "not authorized"
+      - "access denied"
+    explanation: "You don't have permission to perform this action"
+    solutions:
+      - problem: "Insufficient permissions"
+        solution: "Contact your organization admin to grant the necessary permissions for your API key"
+      - problem: "Accessing resources from another organization"
+        solution: "Ensure you're only accessing resources that belong to your organization"
+
+  rate_limit:
+    patterns:
+      - "rate limit"
+      - "too many requests"
+      - "throttled"
+    explanation: "You've exceeded the API rate limits"
+    solutions:
+      - problem: "Too many requests"
+        solution: "Implement exponential backoff retry logic"
+        code_example: |
+          // Retry with exponential backoff
+          const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+          let retries = 0;
+          while (retries < 3) {
+            try {
+              const response = await makeApiCall();
+              return response;
+            } catch (error) {
+              if (error.status === 429) {
+                await delay(Math.pow(2, retries) * 1000);
+                retries++;
+              } else {
+                throw error;
+              }
+            }
+          }
+
+  graphql_syntax:
+    patterns:
+      - "syntax error"
+      - "parse error"
+      - "cannot query field"
+      - "unknown field"
+    explanation: "The GraphQL query contains syntax errors or references invalid fields"
+    solutions:
+      - problem: "GraphQL syntax error"
+        solution: "Validate your GraphQL query syntax using a GraphQL playground or validator"
+      - problem: "Invalid field names"
+        solution: "Check field names against the schema - they are case-sensitive"
+      - problem: "Missing field selections"
+        solution: "Ensure you select specific fields to return, not just the object"
+        code_example: |
+          # Incorrect:
+          query { client(id: "123") }
+          
+          # Correct:
+          query { client(id: "123") { id firstName lastName } }
+
+  not_found:
+    patterns:
+      - "not found"
+      - "does not exist"
+      - "could not find"
+    explanation: "The requested resource doesn't exist"
+    solutions:
+      - problem: "Resource not found"
+        solution: "Verify the ID is correct and the resource exists in your organization"
+      - problem: "Deleted resource"
+        solution: "The resource may have been deleted - check with soft-deleted records if applicable"
+
+# Healthcare-specific error context
+healthcare_terms:
+  - patient
+  - provider
+  - appointment
+  - insurance
+  - claim
+  - diagnosis
+  - prescription
+  - HIPAA
+  - PHI
+  - consent
+
+# Compliance messages
+compliance_notes:
+  hipaa_reminder: "Remember: When handling healthcare data, ensure HIPAA compliance by:"
+  hipaa_requirements:
+    - "Only accessing the minimum necessary information"
+    - "Implementing proper audit logging"
+    - "Using secure connections (HTTPS)"
+    - "Properly handling PHI in error messages and logs"
+  
+  data_privacy: "Never log or expose sensitive patient information in error messages"
+
+# General error guidance
+general_guidance:
+  - "Check the Healthie API documentation for detailed field requirements"
+  - "Use the GraphQL playground to test queries before implementing"
+  - "Enable detailed error logging in development environments"
+  - "Implement proper error handling and user-friendly messages"
+  - "Consider implementing retry logic for transient failures"

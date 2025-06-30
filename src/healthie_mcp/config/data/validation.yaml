@@ -1,0 +1,153 @@
+# Validation Rules and Patterns for Healthie MCP Server
+# This file contains validation patterns, rules, and field-specific configurations
+
+# Regex patterns for common field types
+patterns:
+  email: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+  phone: '^\+?[1-9]\d{1,14}$'  # E.164 format
+  date: '^\d{4}-\d{2}-\d{2}$'  # YYYY-MM-DD
+  datetime: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})?$'  # ISO 8601
+  zip_code: '^\d{5}(-\d{4})?$'  # US ZIP code
+  url: '^https?://[^\s/$.?#].[^\s]*$'
+  uuid: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+
+# GraphQL scalar type validators
+scalar_types:
+  ID:
+    description: "Unique identifier"
+    validation: "Must be a non-empty string"
+  String:
+    description: "Text value"
+    validation: "Any string value"
+  Int:
+    description: "32-bit integer"
+    validation: "Integer between -2147483648 and 2147483647"
+  Float:
+    description: "Floating point number"
+    validation: "Any decimal number"
+  Boolean:
+    description: "True or false"
+    validation: "Must be exactly true or false"
+  Date:
+    description: "Date without time"
+    validation: "Format: YYYY-MM-DD"
+    pattern: "date"
+  DateTime:
+    description: "Date with time"
+    validation: "ISO 8601 format with timezone"
+    pattern: "datetime"
+
+# Healthcare-specific field validation rules
+healthcare_fields:
+  patient:
+    firstName:
+      required: true
+      min_length: 1
+      max_length: 50
+      description: "Patient's first name"
+    lastName:
+      required: true
+      min_length: 1
+      max_length: 50
+      description: "Patient's last name"
+    email:
+      required: true
+      pattern: "email"
+      unique: true
+      description: "Patient's email address"
+    phone:
+      required: false
+      pattern: "phone"
+      description: "Phone number in international format"
+    dateOfBirth:
+      required: true
+      pattern: "date"
+      validation: "Must be a past date"
+      description: "Patient's date of birth"
+    gender:
+      required: false
+      allowed_values: ["male", "female", "other", "unknown"]
+      description: "Patient's gender"
+    
+  appointment:
+    startTime:
+      required: true
+      pattern: "datetime"
+      validation: "Must be a future datetime"
+      description: "Appointment start time"
+    endTime:
+      required: true
+      pattern: "datetime"
+      validation: "Must be after startTime"
+      description: "Appointment end time"
+    appointmentType:
+      required: true
+      allowed_values: ["consultation", "follow_up", "initial", "telehealth", "group"]
+      description: "Type of appointment"
+    status:
+      required: false
+      allowed_values: ["scheduled", "confirmed", "in_progress", "completed", "cancelled", "no_show"]
+      description: "Appointment status"
+    
+  provider:
+    npi:
+      required: false
+      pattern: '^\d{10}$'
+      description: "National Provider Identifier"
+    licenseNumber:
+      required: false
+      min_length: 5
+      max_length: 20
+      description: "Professional license number"
+    specialty:
+      required: true
+      min_length: 2
+      max_length: 100
+      description: "Provider's medical specialty"
+    
+  insurance:
+    memberNumber:
+      required: true
+      min_length: 5
+      max_length: 50
+      description: "Insurance member ID"
+    groupNumber:
+      required: false
+      min_length: 1
+      max_length: 50
+      description: "Insurance group number"
+    effectiveDate:
+      required: true
+      pattern: "date"
+      description: "Insurance effective date"
+    expirationDate:
+      required: false
+      pattern: "date"
+      validation: "Must be after effectiveDate"
+      description: "Insurance expiration date"
+
+# Common validation error messages
+error_messages:
+  required_field: "{field} is required"
+  invalid_format: "{field} has an invalid format"
+  invalid_email: "Please provide a valid email address"
+  invalid_phone: "Please provide a valid phone number with country code"
+  invalid_date: "Please use YYYY-MM-DD format for dates"
+  invalid_datetime: "Please use ISO 8601 format for datetime values"
+  past_date_required: "{field} must be a date in the past"
+  future_date_required: "{field} must be a date in the future"
+  min_length: "{field} must be at least {min} characters long"
+  max_length: "{field} cannot exceed {max} characters"
+  invalid_value: "{field} must be one of: {allowed_values}"
+  unique_constraint: "{field} must be unique - this value already exists"
+
+# Validation best practices
+best_practices:
+  - "Validate data on both client and server side"
+  - "Provide clear, actionable error messages"
+  - "Group related validation errors together"
+  - "Sanitize user input to prevent injection attacks"
+  - "Use consistent date/time formats throughout the API"
+  - "Validate healthcare identifiers (NPI, DEA, etc.) using checksums where applicable"
+  - "Consider timezone implications for appointment scheduling"
+  - "Implement field-level validation before submission"

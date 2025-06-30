@@ -1,0 +1,177 @@
+# Field Relationships and Usage Configuration for Healthie MCP Server
+# This file contains field relationship mappings and usage patterns
+
+field_relationships:
+  client:
+    related_fields:
+      - field: appointments
+        type: "[Appointment]"
+        description: "All appointments for this patient"
+        usage: "Access patient's appointment history and upcoming visits"
+        performance_impact: "medium"
+        
+      - field: forms
+        type: "[Form]"
+        description: "Forms and assessments completed by patient"
+        usage: "Retrieve intake forms, assessments, and questionnaires"
+        performance_impact: "medium"
+        
+      - field: notes
+        type: "[Note]"
+        description: "Clinical notes and documentation"
+        usage: "Access progress notes, treatment plans"
+        performance_impact: "high"
+        
+      - field: insuranceInfo
+        type: "InsuranceInfo"
+        description: "Patient's insurance details"
+        usage: "Billing and authorization purposes"
+        performance_impact: "low"
+        
+      - field: billingInfo
+        type: "BillingInfo"
+        description: "Billing and payment information"
+        usage: "Financial transactions and balance tracking"
+        performance_impact: "medium"
+        
+  appointment:
+    related_fields:
+      - field: client
+        type: "Client"
+        description: "Patient associated with appointment"
+        usage: "Get patient details for the appointment"
+        performance_impact: "low"
+        
+      - field: provider
+        type: "Provider"
+        description: "Healthcare provider for appointment"
+        usage: "Provider information and specialization"
+        performance_impact: "low"
+        
+      - field: notes
+        type: "[Note]"
+        description: "Notes created during appointment"
+        usage: "Clinical documentation from visit"
+        performance_impact: "medium"
+        
+      - field: forms
+        type: "[Form]"
+        description: "Forms completed for appointment"
+        usage: "Pre-visit questionnaires and assessments"
+        performance_impact: "medium"
+        
+  provider:
+    related_fields:
+      - field: appointments
+        type: "[Appointment]"
+        description: "Provider's appointment schedule"
+        usage: "View provider calendar and availability"
+        performance_impact: "high"
+        
+      - field: clients
+        type: "[Client]"
+        description: "Patients under provider's care"
+        usage: "Provider's patient panel"
+        performance_impact: "high"
+        
+      - field: availableSlots
+        type: "[TimeSlot]"
+        description: "Available appointment times"
+        usage: "Scheduling and availability checks"
+        performance_impact: "medium"
+        
+      - field: organization
+        type: "Organization"
+        description: "Provider's healthcare organization"
+        usage: "Organization details and settings"
+        performance_impact: "low"
+
+# Common field patterns
+field_patterns:
+  pagination:
+    description: "Fields commonly used for pagination"
+    fields:
+      - first
+      - after
+      - last
+      - before
+    usage: "Implement cursor-based pagination for large datasets"
+    
+  filtering:
+    description: "Common filter parameters"
+    fields:
+      - status
+      - dateRange
+      - searchTerm
+      - type
+    usage: "Filter results based on specific criteria"
+    
+  sorting:
+    description: "Sort order fields"
+    fields:
+      - orderBy
+      - order
+    usage: "Control result ordering (ASC/DESC)"
+
+# Field usage recommendations
+usage_recommendations:
+  performance:
+    - field_pattern: "Avoid selecting all nested collections"
+      recommendation: "Select only needed fields from collections"
+      example: "Instead of selecting all appointments, filter by date range"
+      
+    - field_pattern: "Large text fields"
+      recommendation: "Only select content fields when needed"
+      example: "Note content can be large - select separately if needed"
+      
+  security:
+    - field_pattern: "Sensitive patient data"
+      recommendation: "Ensure proper authorization before accessing"
+      example: "SSN, medical history require special permissions"
+      
+    - field_pattern: "Provider credentials"
+      recommendation: "Limit access to licensing information"
+      example: "DEA, NPI numbers should be restricted"
+
+# Complete field sets for common operations
+complete_field_sets:
+  patient_dashboard:
+    description: "Fields needed for patient dashboard view"
+    fields:
+      - id
+      - firstName
+      - lastName
+      - email
+      - phone
+      - dateOfBirth
+      - upcomingAppointments
+      - recentNotes
+      - activeMedications
+      - outstandingBalance
+      
+  appointment_detail:
+    description: "Complete appointment information"
+    fields:
+      - id
+      - startTime
+      - endTime
+      - status
+      - appointmentType
+      - client.firstName
+      - client.lastName
+      - provider.name
+      - provider.specialty
+      - location
+      - notes
+      
+  billing_summary:
+    description: "Patient billing overview"
+    fields:
+      - client.id
+      - client.name
+      - billingInfo.totalBalance
+      - billingInfo.outstandingBalance
+      - recentPayments
+      - pendingClaims
+      - insuranceInfo.primary
+      - insuranceInfo.secondary

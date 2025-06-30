@@ -1,0 +1,134 @@
+# Performance Configuration for Healthie MCP Server
+# This file contains performance thresholds, expensive operations, and optimization rules
+
+# Fields that are potentially expensive to query
+expensive_fields:
+  - notes          # Large text content, potentially many records
+  - forms          # Complex nested data with responses
+  - appointments   # Can be numerous, especially with history
+  - clients        # When queried from provider context
+  - documents      # File attachments and large content
+  - auditLogs      # System-wide logs can be extensive
+
+# Fields that represent collections
+collection_fields:
+  - appointments
+  - clients  
+  - forms
+  - notes
+  - payments
+  - invoices
+  - medications
+  - diagnoses
+  - documents
+  - messages
+
+# Performance penalty scoring
+penalty_scores:
+  nested_collection: 5      # Selecting a collection inside another collection
+  deep_nesting: 3          # Each level of nesting beyond 2
+  multiple_collections: 4   # Each additional collection selected
+  large_text_field: 2      # Fields known to contain large text
+  computed_field: 3        # Fields that require calculation
+  
+# Query complexity thresholds  
+complexity_thresholds:
+  low: 10          # Simple queries, fast execution
+  medium: 25       # Moderate complexity, may need optimization
+  high: 50         # Complex queries, should be optimized
+  critical: 100    # Very complex, likely to timeout
+
+# Execution time estimates (milliseconds)
+execution_estimates:
+  simple_query: "50-100ms"
+  moderate_query: "100-500ms"
+  complex_query: "500-2000ms"
+  heavy_query: "2000ms+"
+
+# Optimization recommendations
+optimization_strategies:
+  - strategy: "Use pagination"
+    when: "Querying collections without limits"
+    example: "Add first: 10 to appointments query"
+    impact: "high"
+    
+  - strategy: "Select specific fields"
+    when: "Using blanket selections on types"
+    example: "Select only id, name instead of all fields"
+    impact: "medium"
+    
+  - strategy: "Add date filters"
+    when: "Querying time-based collections"
+    example: "Filter appointments by date range"
+    impact: "high"
+    
+  - strategy: "Avoid deep nesting"
+    when: "Query depth exceeds 3 levels"
+    example: "Split into multiple focused queries"
+    impact: "medium"
+    
+  - strategy: "Cache static data"
+    when: "Repeatedly querying reference data"
+    example: "Cache provider lists, appointment types"
+    impact: "medium"
+    
+  - strategy: "Use field aliases"
+    when: "Making similar queries in one request"
+    example: "Alias fields to batch multiple queries"
+    impact: "low"
+    
+  - strategy: "Implement DataLoader pattern"
+    when: "N+1 query problems detected"
+    example: "Batch load related entities"
+    impact: "high"
+
+# Performance patterns by use case
+use_case_patterns:
+  patient_search:
+    typical_complexity: "low"
+    optimization_tips:
+      - "Use search filters effectively"
+      - "Limit result count with first parameter"
+      - "Select only display fields initially"
+      
+  appointment_calendar:
+    typical_complexity: "medium"
+    optimization_tips:
+      - "Query specific date ranges"
+      - "Avoid selecting nested patient details"
+      - "Use separate query for appointment details"
+      
+  clinical_documentation:
+    typical_complexity: "high"
+    optimization_tips:
+      - "Page through notes and forms"
+      - "Load content on demand"
+      - "Filter by date and type"
+      
+  billing_reports:
+    typical_complexity: "high"
+    optimization_tips:
+      - "Use date ranges for transactions"
+      - "Aggregate data server-side when possible"
+      - "Consider background job for large exports"
+
+# Monitoring recommendations
+monitoring:
+  track_metrics:
+    - query_execution_time
+    - query_complexity_score
+    - fields_selected_count
+    - nesting_depth
+    - collection_sizes
+    
+  alert_thresholds:
+    slow_query: 2000  # milliseconds
+    high_complexity: 75
+    deep_nesting: 5
+    large_result_set: 1000  # records
+    
+  optimization_triggers:
+    - "Query takes > 1 second"
+    - "Complexity score > 50"
+    - "Result set > 500 records without pagination"
+    - "Nesting depth > 4 levels"

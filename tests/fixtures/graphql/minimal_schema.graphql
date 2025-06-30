@@ -1,0 +1,18 @@
+"""
+Minimal GraphQL schema for basic testing.
+"""
+
+type Query {
+  hello: String
+  user(id: ID!): User
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+}
+
+type Mutation {
+  updateUser(id: ID!, name: String): User
+}

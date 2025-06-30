@@ -1,0 +1,17 @@
+"""
+Invalid GraphQL schema for error testing.
+"""
+
+type Query {
+  hello: String
+  # Missing closing brace for the type
+  user(id: ID!): User
+
+type User {
+  id: ID!
+  name: String!
+  # Invalid field type
+  email: InvalidType!
+}
+
+# Missing type definition for InvalidType

@@ -1,0 +1,252 @@
+# Code Examples Configuration for Healthie MCP Server
+# This file contains code examples for different programming languages
+
+javascript:
+  name: "JavaScript/TypeScript"
+  description: "Modern JavaScript with async/await and TypeScript support"
+  dependencies:
+    - "@apollo/client"
+    - "graphql"
+    - "node-fetch"
+  
+  examples:
+    - operation: "Create Patient"
+      code: |
+        import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+        
+        const client = new ApolloClient({
+          uri: 'https://api.gethealthie.com/graphql',
+          cache: new InMemoryCache(),
+          headers: {
+            'Authorization': 'Bearer YOUR_API_KEY'
+          }
+        });
+        
+        const CREATE_PATIENT = gql`
+          mutation CreatePatient($input: CreateClientInput!) {
+            createClient(input: $input) {
+              client {
+                id
+                firstName
+                lastName
+                email
+              }
+              errors {
+                field
+                message
+              }
+            }
+          }
+        `;
+        
+        async function createPatient(patientData) {
+          try {
+            const { data } = await client.mutate({
+              mutation: CREATE_PATIENT,
+              variables: {
+                input: {
+                  firstName: patientData.firstName,
+                  lastName: patientData.lastName,
+                  email: patientData.email,
+                  phone: patientData.phone
+                }
+              }
+            });
+            
+            if (data.createClient.errors?.length > 0) {
+              console.error('Validation errors:', data.createClient.errors);
+              return null;
+            }
+            
+            return data.createClient.client;
+          } catch (error) {
+            console.error('Error creating patient:', error);
+            throw error;
+          }
+        }
+    
+    - operation: "Query Appointments"
+      code: |
+        const GET_APPOINTMENTS = gql`
+          query GetAppointments($clientId: ID!, $first: Int) {
+            client(id: $clientId) {
+              id
+              appointments(first: $first, status: "scheduled") {
+                edges {
+                  node {
+                    id
+                    startTime
+                    endTime
+                    provider {
+                      name
+                      specialty
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `;
+        
+        async function getUpcomingAppointments(clientId) {
+          const { data } = await client.query({
+            query: GET_APPOINTMENTS,
+            variables: { clientId, first: 10 }
+          });
+          
+          return data.client.appointments.edges.map(edge => edge.node);
+        }
+
+python:
+  name: "Python"
+  description: "Python with requests library or gql client"
+  dependencies:
+    - "requests"
+    - "gql[all]"
+    
+  examples:
+    - operation: "Create Patient"
+      code: |
+        import requests
+        import json
+        
+        HEALTHIE_API_URL = "https://api.gethealthie.com/graphql"
+        API_KEY = "YOUR_API_KEY"
+        
+        def create_patient(patient_data):
+            query = """
+            mutation CreatePatient($input: CreateClientInput!) {
+              createClient(input: $input) {
+                client {
+                  id
+                  firstName
+                  lastName
+                  email
+                }
+                errors {
+                  field
+                  message
+                }
+              }
+            }
+            """
+            
+            variables = {
+                "input": {
+                    "firstName": patient_data["firstName"],
+                    "lastName": patient_data["lastName"],
+                    "email": patient_data["email"],
+                    "phone": patient_data.get("phone")
+                }
+            }
+            
+            response = requests.post(
+                HEALTHIE_API_URL,
+                json={
+                    "query": query,
+                    "variables": variables
+                },
+                headers={
+                    "Authorization": f"Bearer {API_KEY}",
+                    "Content-Type": "application/json"
+                }
+            )
+            
+            result = response.json()
+            
+            if "errors" in result:
+                raise Exception(f"GraphQL errors: {result['errors']}")
+                
+            return result["data"]["createClient"]["client"]
+    
+    - operation: "Using GQL Client"
+      code: |
+        from gql import gql, Client
+        from gql.transport.aiohttp import AIOHTTPTransport
+        
+        # Set up the transport with auth
+        transport = AIOHTTPTransport(
+            url="https://api.gethealthie.com/graphql",
+            headers={"Authorization": f"Bearer {API_KEY}"}
+        )
+        
+        client = Client(transport=transport, fetch_schema_from_transport=True)
+        
+        # Define your query
+        query = gql("""
+            query GetClient($id: ID!) {
+              client(id: $id) {
+                id
+                firstName
+                lastName
+                appointments(first: 5) {
+                  edges {
+                    node {
+                      id
+                      startTime
+                    }
+                  }
+                }
+              }
+            }
+        """)
+        
+        # Execute the query
+        result = client.execute(query, variable_values={"id": "client-id"})
+
+curl:
+  name: "cURL"
+  description: "Command line examples using cURL"
+  
+  examples:
+    - operation: "Basic Query"
+      code: |
+        curl -X POST https://api.gethealthie.com/graphql \
+          -H "Authorization: Bearer YOUR_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "query": "query { clients(first: 10) { edges { node { id firstName lastName } } } }"
+          }'
+    
+    - operation: "Mutation with Variables"
+      code: |
+        curl -X POST https://api.gethealthie.com/graphql \
+          -H "Authorization: Bearer YOUR_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "query": "mutation CreateClient($input: CreateClientInput!) { createClient(input: $input) { client { id } } }",
+            "variables": {
+              "input": {
+                "firstName": "John",
+                "lastName": "Doe",
+                "email": "john.doe@example.com"
+              }
+            }
+          }'
+
+# Common patterns across languages
+common_patterns:
+  authentication:
+    description: "Always include authorization header"
+    pattern: "Authorization: Bearer YOUR_API_KEY"
+    
+  error_handling:
+    description: "Check for both transport and GraphQL errors"
+    checks:
+      - "HTTP status code (4xx, 5xx)"
+      - "GraphQL errors array in response"
+      - "Field-level errors in mutations"
+      
+  pagination:
+    description: "Use cursor-based pagination for collections"
+    pattern: |
+      collections(first: 10, after: "cursor") {
+        edges {
+          node { ... }
+          cursor
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }

@@ -1,0 +1,387 @@
+# GraphQL Query Templates for Healthie MCP Server
+# This file contains all GraphQL query and mutation templates organized by category
+
+patient_management:
+  - name: "Get Patient Details"
+    description: "Retrieve comprehensive patient information including demographics and medical history"
+    query: |
+      query GetPatientDetails($clientId: ID!) {
+        client(id: $clientId) {
+          id
+          firstName
+          lastName
+          email
+          phone
+          dateOfBirth
+          gender
+          address {
+            line1
+            line2
+            city
+            state
+            zipCode
+          }
+          emergencyContact {
+            name
+            phone
+            relationship
+          }
+          medicalHistory {
+            conditions
+            medications
+            allergies
+          }
+          insuranceInfo {
+            primary {
+              name
+              memberNumber
+              groupNumber
+            }
+            secondary {
+              name
+              memberNumber
+              groupNumber
+            }
+          }
+        }
+      }
+    variables:
+      clientId: "patient-id-here"
+    required_variables:
+      - clientId
+    optional_variables: []
+    notes: "Use this query to get complete patient information for dashboard views or detailed patient profiles."
+
+  - name: "Create New Patient"
+    description: "Register a new patient with required demographic information"
+    query: |
+      mutation CreatePatient($input: CreateClientInput!) {
+        createClient(input: $input) {
+          client {
+            id
+            firstName
+            lastName
+            email
+            phone
+            dateOfBirth
+          }
+          errors {
+            field
+            message
+          }
+        }
+      }
+    variables:
+      input:
+        firstName: "John"
+        lastName: "Doe"
+        email: "john.doe@example.com"
+        phone: "+1234567890"
+        dateOfBirth: "1990-01-01"
+    required_variables:
+      - input.firstName
+      - input.lastName
+      - input.email
+    optional_variables:
+      - input.phone
+      - input.dateOfBirth
+      - input.address
+    notes: "Ensure email is unique. Phone number should include country code."
+
+  - name: "Search Patients"
+    description: "Search for patients by name, email, or phone number"
+    query: |
+      query SearchPatients($searchTerm: String!, $first: Int = 10) {
+        clients(first: $first, filter: { searchTerm: $searchTerm }) {
+          edges {
+            node {
+              id
+              firstName
+              lastName
+              email
+              phone
+              dateOfBirth
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          totalCount
+        }
+      }
+    variables:
+      searchTerm: "john"
+      first: 10
+    required_variables:
+      - searchTerm
+    optional_variables:
+      - first
+    notes: "Search is case-insensitive and matches partial names, emails, or phone numbers."
+
+appointments:
+  - name: "Get Available Appointment Slots"
+    description: "Retrieve available appointment slots for a provider within a date range"
+    query: |
+      query GetAvailableSlots($providerId: ID!, $startDate: Date!, $endDate: Date!) {
+        provider(id: $providerId) {
+          id
+          name
+          availableSlots(startDate: $startDate, endDate: $endDate) {
+            startTime
+            endTime
+            duration
+            appointmentType
+            isAvailable
+          }
+          workingHours {
+            dayOfWeek
+            startTime
+            endTime
+          }
+        }
+      }
+    variables:
+      providerId: "provider-id-here"
+      startDate: "2024-01-01"
+      endDate: "2024-01-07"
+    required_variables:
+      - providerId
+      - startDate
+      - endDate
+    optional_variables: []
+    notes: "Date range should not exceed 30 days for optimal performance."
+
+  - name: "Book Appointment"
+    description: "Schedule a new appointment for a patient with a provider"
+    query: |
+      mutation BookAppointment($input: CreateAppointmentInput!) {
+        createAppointment(input: $input) {
+          appointment {
+            id
+            startTime
+            endTime
+            appointmentType
+            status
+            client {
+              id
+              firstName
+              lastName
+            }
+            provider {
+              id
+              name
+            }
+          }
+          errors {
+            field
+            message
+          }
+        }
+      }
+    variables:
+      input:
+        clientId: "patient-id-here"
+        providerId: "provider-id-here"
+        startTime: "2024-01-01T10:00:00Z"
+        endTime: "2024-01-01T11:00:00Z"
+        appointmentType: "consultation"
+        notes: "Initial consultation"
+    required_variables:
+      - input.clientId
+      - input.providerId
+      - input.startTime
+      - input.endTime
+    optional_variables:
+      - input.appointmentType
+      - input.notes
+    notes: "Verify slot availability before booking. Times should be in ISO 8601 format."
+
+  - name: "Get Patient Appointments"
+    description: "Retrieve all appointments for a specific patient"
+    query: |
+      query GetPatientAppointments($clientId: ID!, $status: AppointmentStatus) {
+        client(id: $clientId) {
+          id
+          firstName
+          lastName
+          appointments(status: $status) {
+            id
+            startTime
+            endTime
+            appointmentType
+            status
+            notes
+            provider {
+              id
+              name
+              specialty
+            }
+            location {
+              name
+              address
+            }
+          }
+        }
+      }
+    variables:
+      clientId: "patient-id-here"
+      status: "scheduled"
+    required_variables:
+      - clientId
+    optional_variables:
+      - status
+    notes: "Status can be: scheduled, completed, cancelled, no_show"
+
+clinical_data:
+  - name: "Get Patient Forms"
+    description: "Retrieve forms and assessments for a patient"
+    query: |
+      query GetPatientForms($clientId: ID!, $formType: String) {
+        client(id: $clientId) {
+          id
+          forms(type: $formType) {
+            id
+            name
+            formType
+            status
+            submittedAt
+            responses {
+              questionId
+              question
+              answer
+              answerType
+            }
+            provider {
+              id
+              name
+            }
+          }
+        }
+      }
+    variables:
+      clientId: "patient-id-here"
+      formType: "intake"
+    required_variables:
+      - clientId
+    optional_variables:
+      - formType
+    notes: "Common form types: intake, assessment, progress_note, care_plan"
+
+  - name: "Create Clinical Note"
+    description: "Create a clinical note or progress note for a patient"
+    query: |
+      mutation CreateClinicalNote($input: CreateNoteInput!) {
+        createNote(input: $input) {
+          note {
+            id
+            title
+            content
+            noteType
+            createdAt
+            client {
+              id
+              firstName
+              lastName
+            }
+            provider {
+              id
+              name
+            }
+          }
+          errors {
+            field
+            message
+          }
+        }
+      }
+    variables:
+      input:
+        clientId: "patient-id-here"
+        title: "Progress Note"
+        content: "Patient showed improvement in symptoms..."
+        noteType: "progress_note"
+        isPrivate: false
+    required_variables:
+      - input.clientId
+      - input.title
+      - input.content
+    optional_variables:
+      - input.noteType
+      - input.isPrivate
+    notes: "Note types: progress_note, assessment, treatment_plan, discharge_summary"
+
+billing:
+  - name: "Get Patient Billing Summary"
+    description: "Retrieve billing information and payment history for a patient"
+    query: |
+      query GetPatientBilling($clientId: ID!) {
+        client(id: $clientId) {
+          billingInfo {
+            totalBalance
+            outstandingBalance
+            lastPaymentDate
+            lastPaymentAmount
+            paymentMethod
+          }
+          invoices {
+            id
+            invoiceNumber
+            amount
+            status
+            dueDate
+            services {
+              description
+              amount
+              cptCode
+            }
+          }
+          payments {
+            id
+            amount
+            paymentDate
+            paymentMethod
+            status
+          }
+        }
+      }
+    variables:
+      clientId: "patient-id-here"
+    required_variables:
+      - clientId
+    optional_variables: []
+    notes: "Includes current balance, payment history, and outstanding invoices"
+
+  - name: "Process Payment"
+    description: "Process a payment for a patient's outstanding balance"
+    query: |
+      mutation ProcessPayment($input: ProcessPaymentInput!) {
+        processPayment(input: $input) {
+          payment {
+            id
+            amount
+            paymentMethod
+            status
+            transactionId
+            processedAt
+          }
+          errors {
+            field
+            message
+          }
+        }
+      }
+    variables:
+      input:
+        clientId: "patient-id-here"
+        amount: 100.00
+        paymentMethod: "credit_card"
+        cardToken: "card-token-here"
+    required_variables:
+      - input.clientId
+      - input.amount
+      - input.paymentMethod
+    optional_variables:
+      - input.cardToken
+      - input.notes
+    notes: "Use tokenized card information for PCI compliance"

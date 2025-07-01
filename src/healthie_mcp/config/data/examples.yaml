@@ -23,12 +23,12 @@ javascript:
         });
         
         const CREATE_PATIENT = gql`
-          mutation CreatePatient($input: CreateClientInput!) {
-            createClient(input: $input) {
-              client {
+          mutation CreatePatient($input: signUpInput!) {
+            signUp(input: $input) {
+              user {
                 id
-                firstName
-                lastName
+                first_name
+                last_name
                 email
               }
               errors {
@@ -45,20 +45,22 @@ javascript:
               mutation: CREATE_PATIENT,
               variables: {
                 input: {
-                  firstName: patientData.firstName,
-                  lastName: patientData.lastName,
+                  first_name: patientData.first_name,
+                  last_name: patientData.last_name,
                   email: patientData.email,
-                  phone: patientData.phone
+                  phone_number: patientData.phone_number,
+                  role: "patient",
+                  dietitian_id: patientData.dietitian_id
                 }
               }
             });
             
-            if (data.createClient.errors?.length > 0) {
-              console.error('Validation errors:', data.createClient.errors);
+            if (data.signUp.errors?.length > 0) {
+              console.error('Validation errors:', data.signUp.errors);
               return null;
             }
             
-            return data.createClient.client;
+            return data.signUp.user;
           } catch (error) {
             console.error('Error creating patient:', error);
             throw error;
@@ -75,11 +77,12 @@ javascript:
                 edges {
                   node {
                     id
-                    startTime
-                    endTime
-                    provider {
-                      name
-                      specialty
+                    date
+                    time
+                    end_time
+                    attendees {
+                      first_name
+                      last_name
                     }
                   }
                 }
@@ -115,12 +118,12 @@ python:
         
         def create_patient(patient_data):
             query = """
-            mutation CreatePatient($input: CreateClientInput!) {
-              createClient(input: $input) {
-                client {
+            mutation CreatePatient($input: signUpInput!) {
+              signUp(input: $input) {
+                user {
                   id
-                  firstName
-                  lastName
+                  first_name
+                  last_name
                   email
                 }
                 errors {
@@ -133,10 +136,12 @@ python:
             
             variables = {
                 "input": {
-                    "firstName": patient_data["firstName"],
-                    "lastName": patient_data["lastName"],
+                    "first_name": patient_data["first_name"],
+                    "last_name": patient_data["last_name"],
                     "email": patient_data["email"],
-                    "phone": patient_data.get("phone")
+                    "phone_number": patient_data.get("phone_number"),
+                    "role": "patient",
+                    "dietitian_id": patient_data.get("dietitian_id")
                 }
             }
             
@@ -157,7 +162,7 @@ python:
             if "errors" in result:
                 raise Exception(f"GraphQL errors: {result['errors']}")
                 
-            return result["data"]["createClient"]["client"]
+            return result["data"]["signUp"]["user"]
     
     - operation: "Using GQL Client"
       code: |
@@ -177,13 +182,14 @@ python:
             query GetClient($id: ID!) {
               client(id: $id) {
                 id
-                firstName
-                lastName
+                first_name
+                last_name
                 appointments(first: 5) {
                   edges {
                     node {
                       id
-                      startTime
+                      date
+                      time
                     }
                   }
                 }
@@ -205,7 +211,7 @@ curl:
           -H "Authorization: Bearer YOUR_API_KEY" \
           -H "Content-Type: application/json" \
           -d '{
-            "query": "query { clients(first: 10) { edges { node { id firstName lastName } } } }"
+            "query": "query { clients(first: 10) { edges { node { id first_name last_name } } } }"
           }'
     
     - operation: "Mutation with Variables"
@@ -214,12 +220,14 @@ curl:
           -H "Authorization: Bearer YOUR_API_KEY" \
           -H "Content-Type: application/json" \
           -d '{
-            "query": "mutation CreateClient($input: CreateClientInput!) { createClient(input: $input) { client { id } } }",
+            "query": "mutation SignUp($input: signUpInput!) { signUp(input: $input) { user { id first_name last_name } errors { field message } } }",
             "variables": {
               "input": {
-                "firstName": "John",
-                "lastName": "Doe",
-                "email": "john.doe@example.com"
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "john.doe@example.com",
+                "phone_number": "+1234567890",
+                "role": "patient"
               }
             }
           }'

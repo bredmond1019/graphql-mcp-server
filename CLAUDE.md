@@ -257,6 +257,226 @@ class ToolResult(BaseModel):
 - **Interoperability**: FHIR-aware patterns and mappings
 - **Clinical Context**: Medical terminology and identifier validation
 
+## Healthie GraphQL API Reference
+
+### Common Query Names
+
+#### User & Authentication
+- `currentUser`: Get the current authenticated user
+- `basicUserInfoFromToken`: Get basic user info from a token
+- `user`: Get a user by ID
+- `users`: List users with filtering
+
+#### Appointments
+- `appointment`: Get appointment by ID
+- `appointments`: List appointments with filtering
+- `appointmentType`: Get appointment type details
+- `appointmentTypes`: List appointment types
+- `appointmentSetting`: Get appointment settings
+- `availabilities`: List provider availabilities
+- `availableSlotsForRange`: Find available appointment slots
+
+#### Patient Care
+- `carePlan`: Get care plan by ID
+- `carePlans`: List care plans
+- `entries`: List patient entries (food, metrics, etc.)
+- `entry`: Get specific entry
+- `goals`: List patient goals
+- `medications`: List patient medications
+- `allergySuggestions`: Get allergy/allergen suggestions
+- `documents`: List documents
+- `forms`: List form templates
+- `formAnswerGroups`: List completed forms
+
+#### Clinical Documentation
+- `chartingNote`: Get charting note
+- `chartingNotes`: List charting notes
+- `customModuleForms`: List custom forms
+- `smartPhrases`: List smart phrases for documentation
+
+#### Billing & Insurance
+- `billingItem`: Get billing item
+- `billingItems`: List billing items
+- `insurancePlans`: List insurance plans
+- `superBills`: List super bills
+- `cptCodes`: List CPT codes
+- `icdCodes`: List ICD codes
+- `claims`: List insurance claims
+
+#### Organization & Provider
+- `organization`: Get organization details
+- `organizationMembers`: List organization members
+- `providers`: List providers
+- `groups`: List user groups
+- `tags`: List tags for categorization
+
+#### Messaging & Communication
+- `conversation`: Get conversation
+- `conversations`: List conversations
+- `announcements`: List announcements
+- `notifications`: List notifications
+
+### Common Mutation Names
+
+#### User Management
+- `signUp`: Register new user
+- `signIn`: Authenticate user
+- `createClient`: Create new patient/client
+- `updateClient`: Update patient/client
+- `archiveClient`: Archive patient/client
+- `bulkUpdateClients`: Bulk update multiple clients
+
+#### Appointments
+- `createAppointment`: Schedule new appointment
+- `updateAppointment`: Modify appointment
+- `deleteAppointment`: Cancel appointment
+- `createAppointmentType`: Create appointment type
+- `createAvailability`: Set provider availability
+- `bulkCreateAvailability`: Set multiple availabilities
+
+#### Clinical Documentation
+- `createFormAnswerGroup`: Submit form responses
+- `updateFormAnswerGroup`: Update form responses
+- `createChartingNote`: Create clinical note
+- `updateChartingNote`: Update clinical note
+- `signChartingNote`: Sign/lock clinical note
+- `createCarePlan`: Create care plan
+- `updateCarePlan`: Update care plan
+
+#### Patient Data
+- `createEntry`: Log patient data (food, metrics)
+- `updateEntry`: Update patient entry
+- `deleteEntry`: Remove patient entry
+- `createGoal`: Set patient goal
+- `updateGoal`: Update patient goal
+- `createMedication`: Add medication
+- `updateMedication`: Update medication
+
+#### Billing & Payments
+- `createBillingItem`: Create billing item
+- `createSuperBill`: Generate super bill
+- `createPaymentIntent`: Initiate payment
+- `createSubscription`: Set up recurring payment
+- `createInsuranceClaim`: Submit insurance claim
+- `createRequestedPayment`: Request payment from patient
+
+#### Communication
+- `createConversation`: Start new conversation
+- `createComment`: Add comment to conversation
+- `createAnnouncement`: Post announcement
+- `createTask`: Assign task
+- `updateTask`: Update task status
+
+### Important GraphQL Types
+
+#### Core User Types
+- `User`: Base user type (patients, providers, staff)
+- `Organization`: Healthcare organization
+- `OrganizationMembership`: User's role in organization
+- `Provider`: Healthcare provider with additional fields
+
+#### Appointment Types
+- `Appointment`: Appointment with attendees, provider, type
+- `AppointmentType`: Template for appointments
+- `AppointmentSetting`: Provider-specific settings
+- `Availability`: Provider availability slots
+
+#### Clinical Types
+- `CarePlan`: Patient care plan with goals
+- `ChartingNote`: Clinical documentation
+- `FormAnswerGroup`: Completed form responses
+- `Entry`: Patient logged data (food, metrics, etc.)
+- `Goal`: Patient health goals
+- `Medication`: Patient medications
+- `AllergySensitivity`: Patient allergies
+
+#### Billing Types
+- `BillingItem`: Line item for billing
+- `SuperBill`: Itemized billing statement
+- `InsurancePlan`: Insurance plan details
+- `InsuranceClaim`: Submitted claim
+- `Payment`: Payment record
+- `Subscription`: Recurring payment setup
+
+#### Communication Types
+- `Conversation`: Message thread
+- `Comment`: Individual message
+- `Task`: Assigned task
+- `Notification`: System notification
+- `Announcement`: Broadcast message
+
+### Key Input Types
+
+#### User Inputs
+- `CreateClientInput`: Create new patient
+- `UpdateClientInput`: Update patient details
+- `SignUpInput`: User registration
+- `SignInInput`: User authentication
+
+#### Appointment Inputs
+- `AppointmentInput`: Create/update appointment
+- `AppointmentTypeInput`: Define appointment type
+- `AvailabilityInput`: Set availability
+
+#### Clinical Inputs
+- `FormAnswerGroupInput`: Submit form responses
+- `ChartingNoteInput`: Create/update clinical note
+- `CarePlanInput`: Create/update care plan
+- `EntryInput`: Log patient data
+- `MedicationInput`: Add/update medication
+
+#### Billing Inputs
+- `BillingItemInput`: Create billing item
+- `PaymentInput`: Process payment
+- `InsuranceClaimInput`: Submit claim
+
+### Common Field Patterns
+
+#### Timestamp Fields
+Most types include:
+- `created_at`: Creation timestamp
+- `updated_at`: Last modification timestamp
+- `deleted_at`: Soft deletion timestamp (if applicable)
+
+#### Relationship Fields
+- `user`: Associated user/patient
+- `provider`: Associated provider
+- `organization`: Associated organization
+- `created_by`: User who created the record
+
+#### Status Fields
+- `active`: Boolean for active/inactive
+- `status`: Enum for various states
+- `is_public`: Visibility flag
+- `archived`: Soft deletion flag
+
+#### Metadata Fields
+- `id`: Unique identifier (usually ID type)
+- `display_name`: Human-readable name
+- `description`: Detailed description
+- `metadata`: JSON field for custom data
+
+### Healthcare-Specific Patterns
+
+#### Medical Identifiers
+- `npi`: National Provider Identifier
+- `dea`: DEA number
+- `medical_record_number`: MRN
+- `insurance_member_id`: Insurance ID
+
+#### Clinical Fields
+- `icd10_codes`: Diagnosis codes
+- `cpt_codes`: Procedure codes
+- `units`: Medication/metric units
+- `dosage`: Medication dosage
+- `frequency`: Medication frequency
+
+#### Compliance Fields
+- `signed_at`: Document signature timestamp
+- `signed_by`: Signing provider
+- `locked`: Prevents modifications
+- `requires_signature`: Signature requirement flag
+
 ## Documentation
 
 - **[README.md](README.md)**: Project overview and features

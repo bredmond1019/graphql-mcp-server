@@ -1,0 +1,276 @@
+# Environment Manager Configuration
+# Provides deployment and environment management guidance
+
+environments:
+  development:
+    name: "Development"
+    description: "Local development environment"
+    characteristics:
+      - "Frequent code changes"
+      - "Debug logging enabled"
+      - "Relaxed security settings"
+      - "Test data usage"
+    api_url: "https://staging-api.gethealthie.com/graphql"
+    
+  staging:
+    name: "Staging"
+    description: "Pre-production testing environment"
+    characteristics:
+      - "Production-like configuration"
+      - "Integration testing"
+      - "Performance testing"
+      - "UAT environment"
+    api_url: "https://staging-api.gethealthie.com/graphql"
+    
+  production:
+    name: "Production"
+    description: "Live production environment"
+    characteristics:
+      - "High availability required"
+      - "Strict security settings"
+      - "Performance optimized"
+      - "Real patient data"
+    api_url: "https://api.gethealthie.com/graphql"
+
+configuration_items:
+  api:
+    - name: "HEALTHIE_API_URL"
+      required: true
+      description: "Healthie GraphQL API endpoint"
+      pattern: "^https://.*\\.gethealthie\\.com/graphql$"
+      example: "https://api.gethealthie.com/graphql"
+      security_sensitive: false
+      
+    - name: "HEALTHIE_API_KEY"
+      required: true
+      description: "API key for Healthie authentication"
+      pattern: "^.{10,}$"
+      example: "your_api_key_here"
+      security_sensitive: true
+      
+  network:
+    - name: "REQUEST_TIMEOUT"
+      required: false
+      description: "HTTP request timeout in seconds"
+      pattern: "^\\d+$"
+      example: "30"
+      default: "30"
+      
+    - name: "MAX_RETRIES"
+      required: false
+      description: "Maximum number of retry attempts"
+      pattern: "^\\d+$"
+      example: "3"
+      default: "3"
+      
+  security:
+    - name: "SSL_CERT_PATH"
+      required: true
+      environments: ["production"]
+      description: "Path to SSL certificate"
+      pattern: "^/.+\\.(crt|pem)$"
+      example: "/etc/ssl/certs/server.crt"
+      security_sensitive: true
+      
+    - name: "RATE_LIMIT"
+      required: true
+      environments: ["production"]
+      description: "API rate limit per minute"
+      pattern: "^\\d+$"
+      example: "60"
+      
+  logging:
+    - name: "LOG_LEVEL"
+      required: false
+      description: "Application log level"
+      pattern: "^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$"
+      example: "INFO"
+      default: "INFO"
+
+deployment_steps:
+  pre_deployment:
+    - title: "Verify Infrastructure"
+      description: "Ensure all infrastructure components are ready"
+      commands:
+        - "ping database_host"
+        - "redis-cli ping"
+      validation: "All services respond successfully"
+      
+    - title: "Backup Current State"
+      description: "Create backup of database and configurations"
+      commands:
+        - "./scripts/backup.sh"
+      validation: "Backup file exists and is valid"
+      critical: true
+      
+    - title: "Run Tests"
+      description: "Execute test suite to ensure code quality"
+      commands:
+        - "pytest tests/"
+        - "npm test"
+      validation: "All tests pass"
+      
+  deployment:
+    - title: "Deploy Application"
+      description: "Deploy new application version"
+      commands:
+        - "git pull"
+        - "docker-compose up -d"
+      rollback: "git checkout previous_version && docker-compose up -d"
+      
+    - title: "Run Migrations"
+      description: "Apply database migrations"
+      commands:
+        - "python manage.py migrate"
+      rollback: "python manage.py migrate --reverse"
+      
+  post_deployment:
+    - title: "Smoke Tests"
+      description: "Execute basic functionality tests"
+      commands:
+        - "./scripts/smoke-tests.sh"
+      validation: "All smoke tests pass"
+      
+    - title: "Monitor Health"
+      description: "Check application health"
+      commands:
+        - "curl https://api/health"
+      validation: "Health check returns 200 OK"
+
+secret_types:
+  api_key:
+    name: "API Keys"
+    storage_recommendations:
+      - "Environment variables"
+      - "AWS Secrets Manager"
+      - "HashiCorp Vault"
+      - "Azure Key Vault"
+    rotation_policy: "Every 90 days"
+    never_do:
+      - "Commit to version control"
+      - "Share via email or chat"
+      - "Use same key across environments"
+      - "Log in plain text"
+      
+  database_password:
+    name: "Database Passwords"
+    storage_recommendations:
+      - "Environment variables"
+      - "Connection pooler with encryption"
+      - "Secrets management service"
+    rotation_policy: "Every 60 days"
+    never_do:
+      - "Use default passwords"
+      - "Share credentials"
+      - "Store in application code"
+      - "Use weak passwords"
+      
+  jwt_secret:
+    name: "JWT Secrets"
+    storage_recommendations:
+      - "Environment variables"
+      - "Secure key store"
+    rotation_policy: "With token migration strategy"
+    never_do:
+      - "Use predictable secrets"
+      - "Reuse across applications"
+      - "Expose in API responses"
+      - "Commit to version control"
+
+security_checks:
+  encryption:
+    - name: "ssl_enabled"
+      description: "HTTPS/TLS encryption"
+      required_production: true
+      remediation: "Enable SSL/TLS with valid certificate"
+      
+    - name: "encryption_at_rest"
+      description: "Data encrypted at rest"
+      required_production: true
+      remediation: "Enable encryption for all data storage"
+      
+  network:
+    - name: "cors_configured"
+      description: "CORS properly configured"
+      required_production: true
+      remediation: "Configure CORS to allow only trusted origins"
+      
+    - name: "rate_limiting"
+      description: "API rate limiting"
+      required_production: true
+      remediation: "Implement rate limiting to prevent abuse"
+      
+  authentication:
+    - name: "mfa_enabled"
+      description: "Multi-factor authentication"
+      required_production: true
+      remediation: "Enable and enforce MFA"
+      
+  compliance:
+    - name: "audit_logging"
+      description: "Comprehensive audit logging"
+      required_production: true
+      remediation: "Implement audit logging for all data access"
+      
+  hipaa_specific:
+    - name: "phi_encryption"
+      description: "PHI encryption"
+      required_production: true
+      remediation: "Implement field-level encryption for PHI"
+      compliance: ["HIPAA"]
+      
+    - name: "access_controls"
+      description: "Role-based access controls"
+      required_production: true
+      remediation: "Implement granular access controls"
+      compliance: ["HIPAA"]
+
+transition_checklists:
+  staging_to_production:
+    - "Complete all testing in staging"
+    - "Perform load testing"
+    - "Review all configurations"
+    - "Verify integrations"
+    - "Create production backup"
+    - "Update DNS/load balancer"
+    - "Prepare monitoring"
+    - "Schedule maintenance window"
+    - "Notify stakeholders"
+    - "Prepare incident response"
+    - "Document changes"
+    - "Verify compliance"
+    - "Test disaster recovery"
+    - "Review security"
+    - "Manage secrets properly"
+    
+  development_to_staging:
+    - "Merge feature branches"
+    - "Run test suite"
+    - "Update configurations"
+    - "Deploy to staging"
+    - "Run smoke tests"
+    - "Verify integrations"
+    - "Test with staging data"
+    - "Document issues"
+
+best_practices:
+  deployment:
+    - "Always backup before deployment"
+    - "Use blue-green deployments for zero downtime"
+    - "Implement automated rollback procedures"
+    - "Monitor during and after deployment"
+    - "Document all changes"
+    
+  security:
+    - "Never disable security features in production"
+    - "Regularly rotate secrets and credentials"
+    - "Implement defense in depth"
+    - "Monitor for security events"
+    - "Keep dependencies updated"
+    
+  configuration:
+    - "Use environment-specific configurations"
+    - "Never hardcode sensitive values"
+    - "Validate all configuration on startup"
+    - "Use configuration management tools"
+    - "Version control configuration templates"

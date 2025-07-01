@@ -40,12 +40,12 @@ scalar_types:
 # Healthcare-specific field validation rules
 healthcare_fields:
   patient:
-    firstName:
+    first_name:
       required: true
       min_length: 1
       max_length: 50
       description: "Patient's first name"
-    lastName:
+    last_name:
       required: true
       min_length: 1
       max_length: 50
@@ -55,11 +55,11 @@ healthcare_fields:
       pattern: "email"
       unique: true
       description: "Patient's email address"
-    phone:
+    phone_number:
       required: false
       pattern: "phone"
       description: "Phone number in international format"
-    dateOfBirth:
+    date_of_birth:
       required: true
       pattern: "date"
       validation: "Must be a past date"
@@ -70,20 +70,22 @@ healthcare_fields:
       description: "Patient's gender"
     
   appointment:
-    startTime:
+    date:
       required: true
-      pattern: "datetime"
-      validation: "Must be a future datetime"
+      pattern: "date"
+      validation: "Must be a valid date"
+      description: "Appointment date"
+    time:
+      required: true
       description: "Appointment start time"
-    endTime:
+    end_time:
       required: true
-      pattern: "datetime"
-      validation: "Must be after startTime"
+      validation: "Must be after time"
       description: "Appointment end time"
-    appointmentType:
+    contact_type:
       required: true
-      allowed_values: ["consultation", "follow_up", "initial", "telehealth", "group"]
-      description: "Type of appointment"
+      allowed_values: ["video_call", "phone_call", "in_person", "chat"]
+      description: "Type of appointment contact"
     status:
       required: false
       allowed_values: ["scheduled", "confirmed", "in_progress", "completed", "cancelled", "no_show"]
@@ -94,7 +96,7 @@ healthcare_fields:
       required: false
       pattern: '^\d{10}$'
       description: "National Provider Identifier"
-    licenseNumber:
+    license_number:
       required: false
       min_length: 5
       max_length: 20
@@ -106,24 +108,24 @@ healthcare_fields:
       description: "Provider's medical specialty"
     
   insurance:
-    memberNumber:
+    num:
       required: true
       min_length: 5
       max_length: 50
       description: "Insurance member ID"
-    groupNumber:
+    group_num:
       required: false
       min_length: 1
       max_length: 50
       description: "Insurance group number"
-    effectiveDate:
+    effective_date:
       required: true
       pattern: "date"
       description: "Insurance effective date"
-    expirationDate:
+    expiration_date:
       required: false
       pattern: "date"
-      validation: "Must be after effectiveDate"
+      validation: "Must be after effective_date"
       description: "Insurance expiration date"
 
 # Common validation error messages

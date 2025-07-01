@@ -20,6 +20,10 @@ from .tools.workflow_sequences import setup_workflow_sequence_tool
 from .tools.field_usage import setup_field_usage_tool
 from .tools.integration_testing import setup_integration_testing_tool
 from .tools.webhook_configurator import setup_webhook_configurator_tool
+from .tools.compliance_checker import setup_compliance_checker_tool
+from .tools.rate_limit_advisor import setup_rate_limit_advisor_tool
+from .tools.environment_manager import setup_environment_manager_tool
+from .tools.api_usage_analytics import setup_api_usage_analytics_tool
 
 # Create the FastMCP server
 mcp = FastMCP("Healthie Development Assistant")
@@ -47,6 +51,10 @@ setup_workflow_sequence_tool(mcp, schema_manager)
 setup_field_usage_tool(mcp, schema_manager)
 setup_integration_testing_tool(mcp, schema_manager)
 setup_webhook_configurator_tool(mcp, schema_manager)
+setup_compliance_checker_tool(mcp, schema_manager)
+setup_rate_limit_advisor_tool(mcp, schema_manager)
+setup_environment_manager_tool(mcp, schema_manager)
+setup_api_usage_analytics_tool(mcp, schema_manager)
 
 @mcp.resource("healthie://schema/current")
 def get_current_schema() -> str:

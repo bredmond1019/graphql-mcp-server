@@ -27,19 +27,21 @@ import { validatePatientData } from './validation-rules';
 // GraphQL mutation for patient creation
 // Generated using: query_templates workflow="patient_management"
 const CREATE_PATIENT = gql`
-  mutation CreatePatient($input: CreatePatientInput!) {
-    createPatient(input: $input) {
-      patient {
+  mutation CreatePatient($input: signUpInput!) {
+    signUp(input: $input) {
+      user {
         id
         email
-        firstName
-        lastName
-        dateOfBirth
-        phoneNumber
-        medicalRecordNumber
+        first_name
+        last_name
+        date_of_birth
+        phone_number
         # HIPAA: Only include fields necessary for registration confirmation
       }
-      errors
+      errors {
+        field
+        message
+      }
     }
   }
 `;
@@ -61,11 +63,11 @@ export const PatientRegistration = ({
 }) => {
   // Form state management
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     email: '',
-    phoneNumber: '',
-    dateOfBirth: '',
+    phone_number: '',
+    date_of_birth: '',
     gender: '',
     address: {
       street: '',
@@ -101,9 +103,9 @@ export const PatientRegistration = ({
   // GraphQL mutation hook
   const [createPatient, { loading, error }] = useMutation(CREATE_PATIENT, {
     onCompleted: (data) => {
-      if (data.createPatient.errors?.length > 0) {
+      if (data.signUp.errors?.length > 0) {
         // Handle business logic errors from server
-        const serverErrors = data.createPatient.errors.reduce((acc, error) => {
+        const serverErrors = data.signUp.errors.reduce((acc, error) => {
           acc[error.field || 'general'] = error.message;
           return acc;
         }, {});
@@ -111,7 +113,7 @@ export const PatientRegistration = ({
         setIsSubmitting(false);
       } else {
         // Success - patient created
-        onSuccess?.(data.createPatient.patient);
+        onSuccess?.(data.signUp.user);
       }
     },
     onError: (error) => {
@@ -152,8 +154,8 @@ export const PatientRegistration = ({
   // Validate current step before proceeding
   const validateStep = (step) => {
     const requiredFieldsByStep = {
-      1: ['firstName', 'lastName', 'email', 'dateOfBirth'],
-      2: ['phoneNumber', 'address.street', 'address.city', 'address.state'],
+      1: ['first_name', 'last_name', 'email', 'date_of_birth'],
+      2: ['phone_number', 'address.street', 'address.city', 'address.state'],
       3: ['consentForTreatment', 'hipaaAuthorization']
     };
 
@@ -197,12 +199,13 @@ export const PatientRegistration = ({
 
     // Prepare data for GraphQL mutation
     const patientInput = {
-      firstName: formData.firstName.trim(),
-      lastName: formData.lastName.trim(),
+      first_name: formData.first_name.trim(),
+      last_name: formData.last_name.trim(),
       email: formData.email.toLowerCase().trim(),
-      phoneNumber: formData.phoneNumber.replace(/\D/g, ''), // Remove non-digits
-      dateOfBirth: formData.dateOfBirth,
+      phone_number: formData.phone_number.replace(/\D/g, ''), // Remove non-digits
+      date_of_birth: formData.date_of_birth,
       gender: formData.gender || null,
+      role: 'patient',
       
       // Address information
       address: {
@@ -254,18 +257,18 @@ export const PatientRegistration = ({
               <FormField
                 label="First Name *"
                 type="text"
-                value={formData.firstName}
-                onChange={(value) => handleInputChange('firstName', value)}
-                error={validationErrors.firstName}
+                value={formData.first_name}
+                onChange={(value) => handleInputChange('first_name', value)}
+                error={validationErrors.first_name}
                 maxLength={50}
               />
               
               <FormField
                 label="Last Name *"
                 type="text"
-                value={formData.lastName}
-                onChange={(value) => handleInputChange('lastName', value)}
-                error={validationErrors.lastName}
+                value={formData.last_name}
+                onChange={(value) => handleInputChange('last_name', value)}
+                error={validationErrors.last_name}
                 maxLength={50}
               />
             </div>
@@ -283,9 +286,9 @@ export const PatientRegistration = ({
               <FormField
                 label="Date of Birth *"
                 type="date"
-                value={formData.dateOfBirth}
-                onChange={(value) => handleInputChange('dateOfBirth', value)}
-                error={validationErrors.dateOfBirth}
+                value={formData.date_of_birth}
+                onChange={(value) => handleInputChange('date_of_birth', value)}
+                error={validationErrors.date_of_birth}
                 max={new Date().toISOString().split('T')[0]} // Can't be future date
               />
               
@@ -314,9 +317,9 @@ export const PatientRegistration = ({
             <FormField
               label="Phone Number *"
               type="tel"
-              value={formData.phoneNumber}
-              onChange={(value) => handleInputChange('phoneNumber', value)}
-              error={validationErrors.phoneNumber}
+              value={formData.phone_number}
+              onChange={(value) => handleInputChange('phone_number', value)}
+              error={validationErrors.phone_number}
               placeholder="+1 (555) 123-4567"
             />
             

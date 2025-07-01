@@ -1,0 +1,278 @@
+# Compliance Checker Tool Configuration
+# Defines rules, patterns, and guidance for healthcare compliance checking
+
+# PHI Field Patterns - Fields that commonly contain Protected Health Information
+phi_patterns:
+  direct_identifiers:
+    patterns:
+      - "ssn|social_security|social_security_number|socialSecurityNumber"
+      - "medical_record|medicalRecord|mrn|medical_record_number|medicalRecordNumber"
+      - "license_number|licenseNumber|driver_license|driversLicense"
+      - "account_number|accountNumber|patient_id|patientId"
+      - "certificate_number|certificateNumber|permit_number|permitNumber"
+    risk_level: "violation"
+    description: "Direct identifiers that can uniquely identify an individual"
+
+  quasi_identifiers:
+    patterns:
+      - "birth_date|birthDate|date_of_birth|dateOfBirth|dob"
+      - "zip_code|zipCode|postal_code|postalCode"
+      - "age"
+      - "gender|sex"
+      - "race|ethnicity"
+    risk_level: "warning"
+    description: "Quasi-identifiers that combined could identify an individual"
+
+  sensitive_health_data:
+    patterns:
+      - "diagnosis|diagnoses|condition|conditions|medical_condition|medicalCondition"
+      - "medication|medications|prescription|prescriptions|drug|drugs"
+      - "treatment|treatments|procedure|procedures|surgery|surgeries"
+      - "lab_result|labResult|test_result|testResult|vital|vitals"
+      - "allergy|allergies|medical_history|medicalHistory"
+      - "mental_health|mentalHealth|psychiatric|psychology"
+      - "substance_abuse|substanceAbuse|addiction"
+    risk_level: "violation"
+    description: "Sensitive health information requiring special protection"
+
+  demographic_data:
+    patterns:
+      - "name|first_name|firstName|last_name|lastName|full_name|fullName"
+      - "address|street|city|state|country"
+      - "phone|telephone|mobile|cell|phone_number|phoneNumber"
+      - "email|email_address|emailAddress"
+    risk_level: "warning"
+    description: "Demographic information that could identify individuals"
+
+  financial_data:
+    patterns:
+      - "insurance|insurance_id|insuranceId|policy_number|policyNumber"
+      - "payment|billing|credit_card|creditCard|bank_account|bankAccount"
+      - "copay|deductible|balance|amount_due|amountDue"
+    risk_level: "warning"
+    description: "Financial information related to healthcare"
+
+  contact_info:
+    patterns:
+      - "emergency_contact|emergencyContact|next_of_kin|nextOfKin"
+      - "guardian|caregiver|family_member|familyMember"
+      - "employer|workplace|work_phone|workPhone"
+    risk_level: "warning"
+    description: "Contact information that could identify individuals"
+
+# Regulatory Framework Rules
+regulatory_frameworks:
+  hipaa:
+    name: "Health Insurance Portability and Accountability Act"
+    description: "U.S. federal law protecting patient health information"
+    requirements:
+      - "Minimum necessary standard for PHI access"
+      - "Patient authorization for PHI disclosure"
+      - "Administrative, physical, and technical safeguards"
+      - "Breach notification requirements"
+      - "Access logging and audit trails"
+      - "Data encryption in transit and at rest"
+    violations:
+      - pattern: "Unrestricted access to patient SSN"
+        message: "Social Security Numbers require specific authorization"
+        recommendation: "Implement role-based access controls and justify business need"
+      - pattern: "Bulk patient data export without filtering"
+        message: "Bulk exports may violate minimum necessary principle"
+        recommendation: "Implement field-level filtering and access controls"
+
+  hitech:
+    name: "Health Information Technology for Economic and Clinical Health Act"
+    description: "Strengthens HIPAA privacy and security provisions"
+    requirements:
+      - "Enhanced breach notification requirements"
+      - "Increased penalties for HIPAA violations"
+      - "Business associate liability"
+      - "Audit controls and integrity controls"
+      - "Automatic logoff for information systems"
+    violations:
+      - pattern: "Unencrypted PHI transmission"
+        message: "HITECH requires encryption of PHI in transit"
+        recommendation: "Implement TLS 1.2+ for all API communications"
+
+  state_privacy:
+    name: "State Privacy Laws"
+    description: "State-specific privacy regulations"
+    state_regulations:
+      CA:
+        - name: "California Consumer Privacy Act (CCPA)"
+          requirements:
+            - "Right to know what personal information is collected"
+            - "Right to delete personal information"
+            - "Right to opt-out of sale of personal information"
+            - "Right to non-discrimination"
+        - name: "California Confidentiality of Medical Information Act (CMIA)"
+          requirements:
+            - "Patient authorization for medical information disclosure"
+            - "Specific requirements for mental health information"
+      NY:
+        - name: "New York SHIELD Act"
+          requirements:
+            - "Reasonable security measures for private information"
+            - "Breach notification requirements"
+            - "Data minimization principles"
+
+  gdpr:
+    name: "General Data Protection Regulation"
+    description: "European Union data protection regulation"
+    requirements:
+      - "Lawful basis for processing personal data"
+      - "Data subject rights (access, rectification, erasure)"
+      - "Data protection by design and by default"
+      - "Data protection impact assessments"
+      - "Consent management"
+
+# Data Handling Practices Assessment
+data_handling_practices:
+  encryption:
+    name: "Data Encryption"
+    frameworks: ["hipaa", "hitech", "gdpr"]
+    checks:
+      - description: "Data encrypted in transit (TLS 1.2+)"
+        compliant_indicators: ["https", "tls", "ssl"]
+        evidence_needed: ["SSL certificate validation", "TLS version verification"]
+      - description: "Data encrypted at rest (AES-256)"
+        compliant_indicators: ["encrypted", "aes", "encryption"]
+        evidence_needed: ["Database encryption configuration", "File system encryption"]
+
+  access_control:
+    name: "Access Control"
+    frameworks: ["hipaa", "hitech", "soc2"]
+    checks:
+      - description: "Role-based access control (RBAC)"
+        compliant_indicators: ["role", "permission", "authorization"]
+        evidence_needed: ["User role definitions", "Permission matrices"]
+      - description: "Multi-factor authentication (MFA)"
+        compliant_indicators: ["mfa", "2fa", "multi_factor"]
+        evidence_needed: ["MFA configuration", "Authentication logs"]
+
+  audit_logging:
+    name: "Audit Logging"
+    frameworks: ["hipaa", "hitech", "soc2"]
+    checks:
+      - description: "Comprehensive access logging"
+        compliant_indicators: ["log", "audit", "tracking"]
+        evidence_needed: ["Log retention policies", "Audit trail examples"]
+      - description: "Log integrity protection"
+        compliant_indicators: ["integrity", "tamper", "hash"]
+        evidence_needed: ["Log integrity verification", "Hash validation"]
+
+  data_minimization:
+    name: "Data Minimization"
+    frameworks: ["hipaa", "gdpr"]
+    checks:
+      - description: "Collect only necessary data"
+        compliant_indicators: ["minimal", "necessary", "required"]
+        evidence_needed: ["Data collection justification", "Field necessity documentation"]
+      - description: "Regular data purging"
+        compliant_indicators: ["retention", "purge", "delete"]
+        evidence_needed: ["Data retention policies", "Deletion schedules"]
+
+# Audit Requirements by Framework
+audit_requirements:
+  access_logging:
+    description: "Log all access to PHI and system resources"
+    frameworks: ["hipaa", "hitech", "soc2"]
+    implementation_guide: "Implement comprehensive logging that captures user ID, timestamp, action, resource accessed, and result"
+    evidence_needed:
+      - "Log retention policy documentation"
+      - "Sample access logs showing required fields"
+      - "Log integrity verification procedures"
+
+  data_integrity:
+    description: "Ensure data integrity and prevent unauthorized alteration"
+    frameworks: ["hipaa", "hitech", "fda"]
+    implementation_guide: "Implement checksums, digital signatures, and version control for critical data"
+    evidence_needed:
+      - "Data integrity verification procedures"
+      - "Change control documentation"
+      - "Backup and recovery procedures"
+
+  authorization:
+    description: "Verify user authorization before granting access"
+    frameworks: ["hipaa", "hitech", "gdpr"]
+    implementation_guide: "Implement role-based access control with principle of least privilege"
+    evidence_needed:
+      - "User access control policies"
+      - "Role definition documentation"
+      - "Access review procedures"
+
+  encryption:
+    description: "Encrypt sensitive data in transit and at rest"
+    frameworks: ["hipaa", "hitech", "gdpr"]
+    implementation_guide: "Use AES-256 for data at rest and TLS 1.2+ for data in transit"
+    evidence_needed:
+      - "Encryption configuration documentation"
+      - "Key management procedures"
+      - "Encryption strength verification"
+
+  retention:
+    description: "Implement appropriate data retention and disposal"
+    frameworks: ["hipaa", "gdpr", "state_privacy"]
+    implementation_guide: "Define retention periods based on legal requirements and business needs"
+    evidence_needed:
+      - "Data retention schedule"
+      - "Secure disposal procedures"
+      - "Deletion verification logs"
+
+  breach_detection:
+    description: "Implement breach detection and response procedures"
+    frameworks: ["hipaa", "hitech", "gdpr"]
+    implementation_guide: "Deploy monitoring tools and incident response procedures"
+    evidence_needed:
+      - "Breach detection procedures"
+      - "Incident response plan"
+      - "Breach notification templates"
+
+# Compliance Recommendations
+recommendations:
+  general:
+    - "Implement principle of least privilege for data access"
+    - "Use field-level access controls for sensitive data"
+    - "Regularly review and update access permissions"
+    - "Implement comprehensive audit logging"
+    - "Encrypt all PHI in transit and at rest"
+    - "Conduct regular security risk assessments"
+    - "Train staff on HIPAA and privacy requirements"
+    - "Implement incident response procedures"
+
+  query_specific:
+    - "Avoid querying direct identifiers unless absolutely necessary"
+    - "Implement query result filtering based on user permissions"
+    - "Use parameterized queries to prevent injection attacks"
+    - "Limit result set sizes to prevent bulk data export"
+    - "Log all queries that access PHI"
+
+  phi_protection:
+    - "De-identify data when possible for analytics"
+    - "Implement data masking for non-production environments"
+    - "Use tokenization for sensitive identifiers"
+    - "Segregate PHI from other application data"
+    - "Implement data loss prevention (DLP) controls"
+
+# Helpful Resources
+resources:
+  hipaa:
+    - "HHS HIPAA Security Rule Guidance: https://www.hhs.gov/hipaa/for-professionals/security/"
+    - "NIST Cybersecurity Framework: https://www.nist.gov/cyberframework"
+    - "HIPAA Risk Assessment Tool: https://www.healthit.gov/topic/privacy-security-and-hipaa/security-risk-assessment-tool"
+
+  state_regulations:
+    - "California CCPA Compliance Guide: https://oag.ca.gov/privacy/ccpa"
+    - "New York SHIELD Act Guide: https://ag.ny.gov/internet/data-security"
+
+  general_security:
+    - "OWASP API Security Top 10: https://owasp.org/www-project-api-security/"
+    - "Healthcare Cybersecurity Best Practices: https://www.hhs.gov/sites/default/files/cybersecurity-best-practices-hc.pdf"
+    - "FHIR Security Implementation Guide: https://www.hl7.org/fhir/security.html"
+
+# Default Messages
+messages:
+  compliant: "The analyzed query appears to be compliant with the specified regulatory frameworks."
+  warning: "The analyzed query has potential compliance concerns that should be addressed."
+  violation: "The analyzed query contains compliance violations that must be resolved."
+  unknown: "Unable to determine compliance status. Additional information needed."

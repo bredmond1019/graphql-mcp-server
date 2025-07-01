@@ -144,6 +144,22 @@ class ConfigLoader:
         """
         return self.load_file("examples")
     
+    def load_compliance_checker(self) -> Dict[str, Any]:
+        """Load compliance checker configuration.
+        
+        Returns:
+            Dictionary containing compliance rules, patterns, and guidance
+        """
+        return self.load_file("compliance_checker")
+    
+    def load_api_usage_analytics(self) -> Dict[str, Any]:
+        """Load API usage analytics configuration.
+        
+        Returns:
+            Dictionary containing usage patterns, thresholds, and optimization rules
+        """
+        return self.load_file("api_usage_analytics")
+    
     def clear_cache(self):
         """Clear the loaded configuration cache."""
         self.load_file.cache_clear()

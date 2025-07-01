@@ -1,0 +1,283 @@
+# Rate Limit Advisor Configuration
+# This file configures the rate limit analysis and optimization recommendations
+
+# API tier definitions with rate limits and pricing
+api_tiers:
+  starter:
+    name: "Starter"
+    monthly_cost: 0
+    included_requests: 10000
+    rate_limit_per_minute: 60
+    rate_limit_per_hour: 1000
+    overage_rate: 0.001
+    features:
+      - "Basic API access"
+      - "Community support"
+      - "Standard rate limits"
+  
+  growth:
+    name: "Growth"
+    monthly_cost: 99
+    included_requests: 100000
+    rate_limit_per_minute: 120
+    rate_limit_per_hour: 5000
+    overage_rate: 0.0008
+    features:
+      - "Enhanced API access"
+      - "Email support"
+      - "Higher rate limits"
+      - "Basic analytics"
+  
+  business:
+    name: "Business"
+    monthly_cost: 299
+    included_requests: 500000
+    rate_limit_per_minute: 300
+    rate_limit_per_hour: 10000
+    overage_rate: 0.0006
+    features:
+      - "Advanced API access"
+      - "Priority support"
+      - "Increased rate limits"
+      - "Advanced analytics"
+      - "Custom integrations"
+  
+  pro:
+    name: "Professional"
+    monthly_cost: 999
+    included_requests: 2000000
+    rate_limit_per_minute: 600
+    rate_limit_per_hour: 20000
+    overage_rate: 0.0004
+    features:
+      - "Premium API access"
+      - "24/7 phone support"
+      - "High rate limits"
+      - "Real-time analytics"
+      - "Dedicated account manager"
+  
+  enterprise:
+    name: "Enterprise"
+    monthly_cost: 2999
+    included_requests: 10000000
+    rate_limit_per_minute: 1200
+    rate_limit_per_hour: 50000
+    overage_rate: 0.0002
+    features:
+      - "Unlimited API access"
+      - "Dedicated support team"
+      - "Custom rate limits"
+      - "Enterprise analytics"
+      - "SLA guarantees"
+      - "Custom contract terms"
+
+# Query complexity definitions
+query_complexity:
+  low:
+    description: "Simple queries with minimal data"
+    typical_response_time_ms: 50-200
+    typical_response_size_kb: 1-10
+    examples:
+      - "Single record lookup by ID"
+      - "Simple create/update mutations"
+      - "Basic field queries"
+  
+  medium:
+    description: "Standard queries with moderate data"
+    typical_response_time_ms: 200-500
+    typical_response_size_kb: 10-100
+    examples:
+      - "List queries with pagination"
+      - "Multi-field queries"
+      - "Simple aggregations"
+  
+  high:
+    description: "Complex queries with significant data"
+    typical_response_time_ms: 500-2000
+    typical_response_size_kb: 100-500
+    examples:
+      - "Nested queries with relationships"
+      - "Search operations"
+      - "Complex filters and sorting"
+  
+  very_high:
+    description: "Heavy queries with large datasets"
+    typical_response_time_ms: 2000-10000
+    typical_response_size_kb: 500+
+    examples:
+      - "Bulk operations"
+      - "Full data exports"
+      - "Complex aggregations"
+      - "Deep nested queries"
+
+# Healthcare-specific considerations
+healthcare_considerations:
+  compliance:
+    - "HIPAA requires audit trails for all PHI access"
+    - "Cached PHI must be encrypted at rest and in transit"
+    - "User-specific cache isolation is mandatory for PHI"
+    - "State regulations may impose additional requirements"
+  
+  data_sensitivity:
+    high_sensitivity:
+      - "Patient demographics"
+      - "Clinical notes"
+      - "Lab results"
+      - "Medications"
+      - "Diagnoses"
+    medium_sensitivity:
+      - "Appointment schedules"
+      - "Provider information"
+      - "Insurance details"
+    low_sensitivity:
+      - "Provider directories"
+      - "Location information"
+      - "Service catalogs"
+
+# Optimization strategies
+optimization_strategies:
+  pagination:
+    description: "Implement efficient pagination for list queries"
+    impact: "30-50% reduction in response size"
+    implementation_effort: "low"
+    best_practices:
+      - "Use cursor-based pagination for consistency"
+      - "Limit page sizes to 20-50 records"
+      - "Implement lazy loading for UI components"
+  
+  field_selection:
+    description: "Request only necessary fields"
+    impact: "40-60% reduction in response size"
+    implementation_effort: "low"
+    best_practices:
+      - "Define field sets for common use cases"
+      - "Avoid selecting all fields by default"
+      - "Use fragments for reusable field selections"
+  
+  batching:
+    description: "Combine multiple queries into single requests"
+    impact: "50-70% reduction in request count"
+    implementation_effort: "medium"
+    best_practices:
+      - "Group related queries together"
+      - "Use aliases for multiple similar queries"
+      - "Implement request deduplication"
+  
+  caching:
+    description: "Implement strategic caching layers"
+    impact: "60-80% reduction for cached queries"
+    implementation_effort: "medium"
+    best_practices:
+      - "Cache reference data aggressively"
+      - "Use short TTLs for patient data"
+      - "Implement cache invalidation webhooks"
+      - "Consider edge caching for global apps"
+  
+  webhooks:
+    description: "Replace polling with event-driven updates"
+    impact: "80-90% reduction in polling requests"
+    implementation_effort: "high"
+    best_practices:
+      - "Implement reliable webhook processing"
+      - "Use exponential backoff for retries"
+      - "Maintain webhook event logs"
+      - "Implement webhook signature validation"
+
+# Caching recommendations by data type
+caching_strategies:
+  reference_data:
+    applicable_to:
+      - "Provider lists"
+      - "Insurance plans"
+      - "Location directories"
+      - "Service catalogs"
+      - "Specialties"
+    cache_duration: "24 hours"
+    invalidation: "Webhook or scheduled refresh"
+    
+  patient_demographics:
+    applicable_to:
+      - "Patient profiles"
+      - "Contact information"
+      - "Insurance details"
+    cache_duration: "1-4 hours"
+    invalidation: "On update or user action"
+    compliance_note: "Must be user-session specific"
+    
+  clinical_data:
+    applicable_to:
+      - "Appointments"
+      - "Clinical notes"
+      - "Lab results"
+    cache_duration: "5-15 minutes"
+    invalidation: "On any modification"
+    compliance_note: "Requires audit logging"
+    
+  real_time_data:
+    applicable_to:
+      - "Available appointment slots"
+      - "Provider availability"
+      - "Queue status"
+    cache_duration: "No caching recommended"
+    alternative: "Use webhooks or SSE"
+
+# Common rate limit scenarios and solutions
+common_scenarios:
+  dashboard_loading:
+    description: "Multiple widgets loading simultaneously"
+    problem: "Burst of requests on page load"
+    solutions:
+      - "Implement request queuing"
+      - "Use data loader pattern"
+      - "Progressive loading with priorities"
+      - "Combine into single dashboard query"
+  
+  data_synchronization:
+    description: "Syncing large datasets"
+    problem: "High volume of requests"
+    solutions:
+      - "Implement incremental sync"
+      - "Use bulk operations"
+      - "Schedule during off-peak hours"
+      - "Implement change data capture"
+  
+  search_operations:
+    description: "Real-time search as user types"
+    problem: "Rapid fire requests"
+    solutions:
+      - "Implement debouncing (300-500ms)"
+      - "Use search suggestions cache"
+      - "Implement client-side filtering"
+      - "Use dedicated search infrastructure"
+  
+  report_generation:
+    description: "Large data exports and reports"
+    problem: "Long-running, data-intensive queries"
+    solutions:
+      - "Implement async job processing"
+      - "Use pagination for exports"
+      - "Pre-aggregate common reports"
+      - "Schedule during low-usage periods"
+
+# Best practices
+best_practices:
+  monitoring:
+    - "Track API usage metrics in real-time"
+    - "Set up alerts for approaching limits"
+    - "Monitor response times and errors"
+    - "Track cache hit rates"
+    - "Analyze usage patterns regularly"
+  
+  error_handling:
+    - "Implement exponential backoff for rate limit errors"
+    - "Queue requests when approaching limits"
+    - "Provide user feedback on rate limiting"
+    - "Log all rate limit incidents"
+    - "Implement circuit breakers"
+  
+  performance:
+    - "Use HTTP/2 for multiplexing"
+    - "Implement connection pooling"
+    - "Use compression for responses"
+    - "Minimize query complexity"
+    - "Implement request prioritization"

@@ -69,7 +69,7 @@ uv run mcp install src/healthie_mcp/server.py:mcp --name "Healthie Assistant"
 
 **Find patient-related fields:**
 ```
-search_schema query="patient" type_filter="type"
+search_schema query="user" type_filter="type"
 ```
 
 **Get pre-built query templates:**
@@ -79,7 +79,7 @@ query_templates workflow="patient_management"
 
 **Understand a specific type:**
 ```
-introspect_type type_name="Patient"
+introspect_type type_name="User"
 ```
 
 **Get code examples:**
@@ -98,15 +98,14 @@ query_templates workflow="patient_management"
 
 **Get response with ready-to-use queries:**
 ```graphql
-mutation CreatePatient($input: CreatePatientInput!) {
-  createPatient(input: $input) {
-    patient {
+mutation CreatePatient($input: signUpInput!) {
+  signUp(input: $input) {
+    user {
       id
       email
-      firstName
-      lastName
-      dateOfBirth
-      phoneNumber
+      first_name
+      last_name
+      phone_number
     }
     errors
   }
@@ -119,16 +118,18 @@ mutation CreatePatient($input: CreatePatientInput!) {
   "variables": {
     "input": {
       "email": "patient@example.com",
-      "firstName": "John",
-      "lastName": "Doe",
-      "dateOfBirth": "1990-01-01",
-      "phoneNumber": "+1234567890"
+      "first_name": "John",
+      "last_name": "Doe",
+      "phone_number": "+1234567890",
+      "role": "patient",
+      "dietitian_id": "provider-id-here"
     }
   },
   "validation_notes": [
     "Email must be unique across the system",
     "Phone number should include country code",
-    "Date of birth must be in YYYY-MM-DD format"
+    "Role must be 'patient' for patient registration",
+    "Either dietitian_id or invite_code is required for patients"
   ]
 }
 ```
@@ -152,9 +153,9 @@ queries:
   - name: "Get Available Slots"
     query: |
       query GetAvailability($providerId: ID!, $date: String!) {
-        availabilitySlots(providerId: $providerId, date: $date) {
-          startTime
-          endTime
+        availabilitySlots(provider_id: $providerId, date: $date) {
+          start_time
+          end_time
           available
         }
       }

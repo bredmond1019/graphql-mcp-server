@@ -1,0 +1,234 @@
+# API Usage Analytics Configuration
+# This configuration drives the behavior of the API usage analytics tool
+
+usage_patterns:
+  peak_hours:
+    description: "High traffic during business hours"
+    detection_criteria:
+      time_windows: ["9-11", "14-16"]
+      threshold_multiplier: 1.5
+  
+  batch_operations:
+    description: "Multiple similar operations in sequence"
+    detection_criteria:
+      min_operations: 5
+      time_window_seconds: 60
+  
+  inefficient_queries:
+    description: "Queries that could be optimized"
+    detection_criteria:
+      n_plus_one_threshold: 3
+      overfetching_ratio: 0.5
+  
+  error_spikes:
+    description: "Sudden increase in error rates"
+    detection_criteria:
+      spike_multiplier: 2.0
+      time_window_minutes: 15
+
+performance_thresholds:
+  response_time:
+    good: 100
+    warning: 500
+    critical: 1000
+    unit: "ms"
+  
+  error_rate:
+    good: 0.01
+    warning: 0.05
+    critical: 0.10
+    unit: "percentage"
+  
+  data_transfer:
+    good: 1000
+    warning: 5000
+    critical: 10000
+    unit: "KB"
+  
+  complexity_score:
+    good: 10
+    warning: 50
+    critical: 100
+    unit: "points"
+
+optimization_rules:
+  query_batching:
+    conditions:
+      min_similar_queries: 3
+      time_window_seconds: 30
+    impact:
+      request_reduction: 0.7
+      performance_gain: 0.5
+    example:
+      before: |
+        // Multiple individual queries
+        query { patient(id: "1") { name } }
+        query { patient(id: "2") { name } }
+        query { patient(id: "3") { name } }
+      after: |
+        // Single batched query
+        query { patients(ids: ["1", "2", "3"]) { name } }
+  
+  field_selection:
+    conditions:
+      unused_field_percentage: 0.5
+      min_fields: 10
+    impact:
+      data_transfer_reduction: 0.6
+      performance_gain: 0.3
+    example:
+      before: |
+        query { patient { 
+          id name email phone address 
+          insurance medications allergies 
+          appointments forms documents 
+        }}
+      after: |
+        query { patient { 
+          id name email phone 
+        }}
+  
+  caching_strategy:
+    conditions:
+      read_write_ratio: 10
+      data_freshness_tolerance_minutes: 5
+    impact:
+      request_reduction: 0.8
+      performance_gain: 0.9
+    cache_recommendations:
+      - "Reference data (providers, locations)"
+      - "User preferences and settings"
+      - "Frequently accessed patient lists"
+  
+  pagination:
+    conditions:
+      result_count_threshold: 50
+      no_pagination_detected: true
+    impact:
+      memory_reduction: 0.7
+      initial_load_improvement: 0.8
+    recommended_sizes:
+      default: 25
+      mobile: 10
+      export: 100
+
+healthcare_metrics:
+  phi_access:
+    sensitive_fields:
+      - "ssn"
+      - "dateOfBirth"
+      - "diagnosis"
+      - "medications"
+      - "labResults"
+      - "clinicalNotes"
+    compliance_checks:
+      - "access_logging"
+      - "encryption"
+      - "authorization"
+      - "audit_trail"
+    risk_levels:
+      low: ["name", "phone"]
+      medium: ["address", "insurance"]
+      high: ["ssn", "diagnosis", "medications"]
+  
+  workflow_patterns:
+    patient_registration:
+      steps:
+        - "create_patient"
+        - "add_demographics"
+        - "add_insurance"
+        - "verify_eligibility"
+        - "schedule_appointment"
+      expected_duration_minutes: 10
+      critical_steps: ["create_patient", "add_insurance"]
+    
+    clinical_documentation:
+      steps:
+        - "create_encounter"
+        - "add_vitals"
+        - "add_notes"
+        - "update_diagnosis"
+        - "create_care_plan"
+      expected_duration_minutes: 20
+      critical_steps: ["create_encounter", "update_diagnosis"]
+    
+    appointment_scheduling:
+      steps:
+        - "check_availability"
+        - "create_appointment"
+        - "send_confirmation"
+        - "add_to_calendar"
+      expected_duration_minutes: 5
+      critical_steps: ["create_appointment"]
+    
+    billing_workflow:
+      steps:
+        - "create_claim"
+        - "add_procedures"
+        - "verify_insurance"
+        - "submit_claim"
+        - "track_status"
+      expected_duration_minutes: 15
+      critical_steps: ["create_claim", "submit_claim"]
+
+insight_categories:
+  performance:
+    priority: "high"
+    indicators:
+      - "slow_response_times"
+      - "high_complexity_queries"
+      - "resource_intensive_operations"
+  
+  security:
+    priority: "critical"
+    indicators:
+      - "unauthorized_access_attempts"
+      - "excessive_phi_access"
+      - "unusual_access_patterns"
+  
+  efficiency:
+    priority: "medium"
+    indicators:
+      - "redundant_queries"
+      - "overfetching_data"
+      - "incomplete_workflows"
+  
+  compliance:
+    priority: "high"
+    indicators:
+      - "missing_audit_logs"
+      - "unencrypted_phi_access"
+      - "authorization_failures"
+
+report_templates:
+  executive_summary:
+    sections:
+      - "key_metrics"
+      - "critical_findings"
+      - "cost_analysis"
+      - "recommendations"
+  
+  technical_report:
+    sections:
+      - "detailed_metrics"
+      - "performance_analysis"
+      - "optimization_opportunities"
+      - "implementation_guide"
+  
+  compliance_report:
+    sections:
+      - "phi_access_summary"
+      - "audit_trail_analysis"
+      - "security_findings"
+      - "remediation_steps"
+
+cost_estimation:
+  api_call_cost: 0.0001  # Cost per API call in USD
+  data_transfer_cost: 0.00001  # Cost per KB transferred
+  compute_time_cost: 0.00005  # Cost per second of compute time
+  
+  cost_factors:
+    - "number_of_requests"
+    - "data_volume"
+    - "query_complexity"
+    - "response_time"

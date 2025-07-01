@@ -7,23 +7,23 @@ patient_management:
     steps:
       - step_number: 1
         operation_type: "mutation"
-        operation_name: "createClient"
+        operation_name: "signUp"
         description: "Create the patient record with basic demographics"
         required_inputs:
-          - firstName
-          - lastName
+          - first_name
+          - last_name
           - email
-          - phone
+          - phone_number
         expected_outputs:
           - client.id
           - client.email
         graphql_example: |
-          mutation CreatePatient($input: CreateClientInput!) {
-            createClient(input: $input) {
-              client {
+          mutation CreatePatient($input: signUpInput!) {
+            signUp(input: $input) {
+              user {
                 id
-                firstName
-                lastName
+                first_name
+                last_name
                 email
               }
               errors { field message }

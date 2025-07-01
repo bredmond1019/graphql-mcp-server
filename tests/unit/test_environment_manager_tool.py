@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import Mock, MagicMock
-from src.healthie_mcp.tools.environment_manager import EnvironmentManagerTool
+from src.healthie_mcp.tools.environment_manager import EnvironmentManager
 from src.healthie_mcp.models.environment_manager import (
     EnvironmentManagerResult,
     ValidationResult,
@@ -27,7 +27,7 @@ class TestEnvironmentManagerTool:
     @pytest.fixture
     def tool(self, mock_schema_manager):
         """Create an Environment Manager tool instance."""
-        return EnvironmentManagerTool(mock_schema_manager)
+        return EnvironmentManager(mock_schema_manager)
     
     def test_tool_name_and_description(self, tool):
         """Test tool has correct name and description."""

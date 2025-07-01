@@ -16,7 +16,7 @@ from src.healthie_mcp.models.api_usage_analytics import (
     PerformanceMetric,
     AnalyticsReport
 )
-from src.healthie_mcp.tools.api_usage_analytics import ApiUsageAnalyticsTool
+from src.healthie_mcp.tools.api_usage_analytics import ApiUsageAnalyzer
 
 
 class TestApiUsageAnalyticsTool:
@@ -30,7 +30,7 @@ class TestApiUsageAnalyticsTool:
     @pytest.fixture
     def tool(self, mock_schema_manager):
         """Create tool instance."""
-        return ApiUsageAnalyticsTool(mock_schema_manager)
+        return ApiUsageAnalyzer(mock_schema_manager)
     
     @pytest.fixture
     def sample_config(self):

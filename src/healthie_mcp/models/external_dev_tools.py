@@ -114,6 +114,12 @@ class CodeExample(BaseModel):
     notes: Optional[str] = None
 
 
+class CodeExampleInput(BaseModel):
+    """Input for code example generation."""
+    operation_name: str
+    language: Optional[str] = None
+
+
 class CodeExampleResult(BaseModel):
     """Result from code example generation."""
     operation_name: str

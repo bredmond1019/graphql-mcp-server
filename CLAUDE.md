@@ -46,7 +46,7 @@ uv run python -c "from src.healthie_mcp.server import mcp; print('✅ Server rea
 
 ### Core Components
 
-1. **FastMCP Server** (`server.py`): Entry point using the official Python MCP SDK that registers 11 specialized tools and 2 resources
+1. **FastMCP Server** (`server.py`): Entry point using the official Python MCP SDK that registers 16 specialized tools and 2 resources
 
 2. **Schema Manager** (`schema_manager.py`): Intelligent GraphQL schema management with automatic downloading, caching, validation, and refresh logic
 
@@ -68,7 +68,7 @@ All tools follow a consistent pattern:
 - Return structured Pydantic models
 - Configuration-driven behavior through YAML files
 
-### Tool Categories (11 Total)
+### Tool Categories (16 Total)
 
 **Core Schema Tools** (require valid Healthie schema):
 - `search_schema`: Advanced regex-based schema search with type filtering and context
@@ -84,10 +84,16 @@ All tools follow a consistent pattern:
 - `field_relationships`: Deep schema relationship mapping and usage patterns
 - `workflow_sequences`: Multi-step healthcare workflow guidance and best practices
 - `field_usage`: Field usage recommendations with healthcare context
+- `integration_testing`: Test generation and validation for API integrations
+- `webhook_configurator`: Webhook setup and configuration guidance
+- `compliance_checker`: HIPAA and healthcare compliance validation
+- `rate_limit_advisor`: API rate limiting guidance and optimization
+- `environment_manager`: Environment configuration and management
+- `api_usage_analytics`: API usage tracking and analytics guidance
 
 ### Configuration Architecture
 
-**8 YAML Configuration Files** in `config/data/`:
+**Configuration Files** in `config/data/`:
 1. **`queries.yaml`**: GraphQL query templates by workflow category
 2. **`patterns.yaml`**: Healthcare patterns, keywords, and FHIR mappings
 3. **`errors.yaml`**: Error types, solutions, and code examples
@@ -96,6 +102,9 @@ All tools follow a consistent pattern:
 6. **`fields.yaml`**: Field relationships and usage patterns
 7. **`performance.yaml`**: Performance thresholds and optimization rules
 8. **`examples.yaml`**: Code examples for different programming languages
+9. **`integration_testing.yaml`**: Test scenarios and validation rules
+10. **`webhook_configurator.yaml`**: Webhook event types and configurations
+11. **`compliance_checker.yaml`**: HIPAA and compliance rules
 
 **Benefits of Configuration-Driven Design**:
 - Healthcare experts can modify behavior without coding

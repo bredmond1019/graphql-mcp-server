@@ -44,7 +44,10 @@ uv run pytest tests/unit/test_config.py::TestConfig::test_default_configuration 
 # Test server startup (useful for debugging)
 uv run python -c "from src.healthie_mcp.server import mcp; print('✅ Server ready')"
 
-# Quick test all 8 working tools
+# Test server with additional tools enabled
+HEALTHIE_ENABLE_ADDITIONAL_TOOLS=true uv run python -c "from src.healthie_mcp.server import mcp; print('✅ Server ready with all 17 tools')"
+
+# Quick test all 8 core tools
 uv run python misc/test_phase_2_simple.py
 
 # Run comprehensive tool testing
@@ -70,10 +73,10 @@ src/healthie_mcp/
 │   └── data/            # 11 YAML configuration files
 ├── models/              # Pydantic models for all tools
 │   └── *.py            # One model file per tool
-├── tools/               # 8 working tool implementations
+├── tools/               # Tool implementations
 │   ├── __init__.py
-│   ├── *.py            # One file per working tool
-│   └── todo/           # 8 TODO tool implementations (not integrated)
+│   ├── *.py            # 8 core tools (always available)
+│   └── additional/     # 9 additional tools (dev environment only)
 └── resources/           # MCP resource implementations
     └── healthie_schema.py
 
@@ -118,9 +121,9 @@ All tools follow a consistent pattern:
 - Return structured Pydantic models
 - Configuration-driven behavior through YAML files
 
-### Tool Categories (8 Working + 8 TODO)
+### Tool Categories (8 Core + 9 Additional)
 
-**Working Tools** (fully implemented and tested):
+**Core Tools** (always available - 8 total):
 - `search_schema`: Advanced regex-based schema search with type filtering and context
 - `query_templates`: Pre-built GraphQL queries organized by healthcare workflows  
 - `code_examples`: Multi-language examples (JavaScript, Python, cURL) with authentication
@@ -130,16 +133,17 @@ All tools follow a consistent pattern:
 - `workflow_sequences`: Multi-step healthcare workflow guidance and best practices
 - `field_relationships`: Deep schema relationship mapping and usage patterns
 
-**TODO Tools** (in `src/healthie_mcp/tools/todo/`, not yet integrated):
-- `find_healthcare_patterns`: Healthcare workflow pattern detection with FHIR awareness
+**Additional Tools** (dev environment only - 9 total):
+Enable with `HEALTHIE_ENABLE_ADDITIONAL_TOOLS=true`
 - `input_validation`: Healthcare-compliant validation with medical identifier support
-- `query_performance`: Performance analysis with healthcare workflow optimization
+- `query_performance`: Performance analysis with healthcare workflow optimization  
+- `healthcare_patterns`: Healthcare workflow pattern detection with FHIR awareness
+- `rate_limit_advisor`: API rate limiting guidance and optimization
 - `field_usage`: Field usage recommendations with healthcare context
 - `integration_testing`: Test generation and validation for API integrations
 - `webhook_configurator`: Webhook setup and configuration guidance
-- `rate_limit_advisor`: API rate limiting guidance and optimization
-- `environment_manager`: Environment configuration and management
 - `api_usage_analytics`: API usage tracking and analytics guidance
+- `environment_manager`: Environment configuration and management
 
 ### Configuration Architecture
 
@@ -195,6 +199,9 @@ DEBUG_MODE="false"             # Enable debug mode
 # Network settings
 REQUEST_TIMEOUT="30"           # HTTP request timeout in seconds
 MAX_RETRIES="3"                # Maximum retry attempts
+
+# Additional tools (dev environment)
+HEALTHIE_ENABLE_ADDITIONAL_TOOLS="false"  # Enable 9 additional tools (17 total)
 ```
 
 **Note**: Never commit your actual API key. The `.env.development` file is included in `.gitignore` to prevent accidental commits.

@@ -32,7 +32,12 @@ uv run python examples/scripts/development-tools/test-basic-imports.py
 export HEALTHIE_API_URL="https://staging-api.gethealthie.com/graphql"
 
 # Set API key (optional but recommended)
-export HEALTHIE_API_KEY="your-api-key-here"
+# Option 1: Use environment file
+cp .env.development.example .env.development
+# Edit .env.development and add your actual API key
+
+# Option 2: Export directly
+export HEALTHIE_API_KEY="<your-actual-api-key>"
 
 # Test configuration
 uv run python examples/scripts/development-tools/test-basic-imports.py

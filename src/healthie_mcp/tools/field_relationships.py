@@ -3,6 +3,7 @@
 import re
 from typing import Optional, List, Set, Dict, Any
 from pydantic import BaseModel, Field
+from mcp.server.fastmcp import FastMCP
 from ..models.external_dev_tools import (
     FieldRelationshipResult, FieldRelationship
 )
@@ -475,7 +476,7 @@ class FieldRelationshipTool(BaseTool[FieldRelationshipResult]):
         return categorized
 
 
-def setup_field_relationship_tool(mcp, schema_manager: SchemaManagerProtocol):
+def setup_field_relationship_tool(mcp: FastMCP, schema_manager: SchemaManagerProtocol):
     """Setup the field relationship tool."""
     tool = FieldRelationshipTool(schema_manager)
 

@@ -58,7 +58,7 @@ const graphqlClient = new ApolloClient({
   uri: 'https://api.gethealthie.com/graphql',
   cache: new InMemoryCache(),
   headers: {
-    'Authorization': `Basic ${process.env.REACT_APP_HEALTHIE_API_KEY}`,
+    'Authorization': `Basic ${process.env.REACT_APP_HEALTHIE_API_KEY || process.env.HEALTHIE_API_KEY}`,
     'AuthorizationSource': 'API'
   }
 });

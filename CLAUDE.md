@@ -114,26 +114,40 @@ All tools follow a consistent pattern:
 
 ## Environment Variables
 
+### Setting Up Environment Variables
+
+1. **Copy the example file**: 
+   ```bash
+   cp .env.development.example .env.development
+   ```
+
+2. **Add your Healthie API key** to `.env.development`:
+   - Open `.env.development` in your editor
+   - Replace `your-actual-api-key-here` with your real API key
+   - The `.env.development` file is gitignored for security
+
+### Available Environment Variables
+
 ```bash
 # Required
-export HEALTHIE_API_URL="https://staging-api.gethealthie.com/graphql"
+HEALTHIE_API_URL="https://staging-api.gethealthie.com/graphql"
+HEALTHIE_API_KEY="<your-api-key>"  # Required for schema downloads
 
-# Optional but recommended for full functionality
-export HEALTHIE_API_KEY="your-api-key"  # Required for schema downloads
-
-# Configuration
-export SCHEMA_DIR="./schemas"          # Local schema cache directory
-export CACHE_ENABLED="true"           # Enable schema caching
-export CACHE_DURATION_HOURS="24"      # Schema cache duration
+# Optional Configuration
+SCHEMA_DIR="./schemas"          # Local schema cache directory
+CACHE_ENABLED="true"           # Enable schema caching
+CACHE_DURATION_HOURS="24"      # Schema cache duration
 
 # Logging and debugging
-export LOG_LEVEL="INFO"               # DEBUG, INFO, WARNING, ERROR, CRITICAL
-export DEBUG_MODE="false"             # Enable debug mode
+LOG_LEVEL="INFO"               # DEBUG, INFO, WARNING, ERROR, CRITICAL
+DEBUG_MODE="false"             # Enable debug mode
 
 # Network settings
-export REQUEST_TIMEOUT="30"           # HTTP request timeout in seconds
-export MAX_RETRIES="3"                # Maximum retry attempts
+REQUEST_TIMEOUT="30"           # HTTP request timeout in seconds
+MAX_RETRIES="3"                # Maximum retry attempts
 ```
+
+**Note**: Never commit your actual API key. The `.env.development` file is included in `.gitignore` to prevent accidental commits.
 
 ## Development Workflow
 

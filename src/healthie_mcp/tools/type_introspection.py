@@ -8,6 +8,7 @@ and capabilities of types in the Healthie API.
 from typing import Optional, List, Dict, Any
 from enum import Enum
 from pydantic import BaseModel, Field
+from mcp.server.fastmcp import FastMCP
 
 from ..models.type_introspection import TypeIntrospectionResult, TypeInfo, FieldInfo, EnumValue
 from ..base import BaseTool, SchemaManagerProtocol
@@ -333,12 +334,12 @@ class TypeIntrospectionTool(BaseTool[TypeIntrospectionResult]):
         return None
 
 
-def setup_type_introspection_tool(mcp, schema_manager) -> None:
+def setup_type_introspection_tool(mcp: FastMCP, schema_manager) -> None:
     """Setup the type introspection tool with the MCP server."""
     tool = TypeIntrospectionTool(schema_manager)
     
     @mcp.tool()
-    def introspect_type(type_name: str) -> TypeIntrospectionResult:
+    def introspect_type(type_name: str) -> dict:
         """Get detailed information about a specific GraphQL type.
         
         This tool provides comprehensive information about GraphQL types including
@@ -351,4 +352,6 @@ def setup_type_introspection_tool(mcp, schema_manager) -> None:
         Returns:
             TypeIntrospectionResult with structured type information
         """
-        return tool.execute(type_name=type_name)
+        input_data = TypeIntrospectionInput(type_name=type_name)
+        result = tool.execute(input_data)
+        return result.model_dump()

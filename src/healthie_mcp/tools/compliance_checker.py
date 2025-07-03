@@ -7,6 +7,7 @@ provides regulatory guidance, and identifies PHI exposure risks.
 
 import re
 from typing import List, Dict, Any, Optional
+from mcp.server.fastmcp import FastMCP
 from src.healthie_mcp.base import BaseTool, SchemaManagerProtocol
 from src.healthie_mcp.models.compliance_checker import (
     ComplianceCheckerInput,
@@ -562,7 +563,7 @@ class ComplianceCheckerTool(BaseTool[ComplianceCheckerResult]):
         return any(indicator in context_lower for indicator in indicators)
 
 
-def setup_compliance_checker_tool(mcp, schema_manager: SchemaManagerProtocol):
+def setup_compliance_checker_tool(mcp: FastMCP, schema_manager: SchemaManagerProtocol):
     """Setup the compliance checker tool."""
     tool = ComplianceCheckerTool(schema_manager)
 

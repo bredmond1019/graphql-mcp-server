@@ -20,8 +20,8 @@ export HEALTHIE_API_URL="https://staging-api.gethealthie.com/graphql"
 ### Optional Settings
 
 ```bash
-# Authentication
-export HEALTHIE_API_KEY="your-api-key-here"
+# Authentication (required for schema downloads)
+export HEALTHIE_API_KEY="<your-actual-api-key>"
 
 # Schema caching
 export SCHEMA_DIR="./schemas"
@@ -41,9 +41,15 @@ export MAX_RETRIES="3"
 
 #### Development Environment
 ```bash
-# .env.development
+# Copy the example file
+cp .env.development.example .env.development
+
+# Edit .env.development and add your actual API key
+# The file is gitignored for security
+
+# Example .env.development content:
 HEALTHIE_API_URL="https://staging-api.gethealthie.com/graphql"
-HEALTHIE_API_KEY=""  # Optional for development
+HEALTHIE_API_KEY="<your-actual-api-key>"  # Replace with real key
 CACHE_ENABLED="true"
 CACHE_DURATION_HOURS="1"  # Shorter cache for development
 LOG_LEVEL="DEBUG"
@@ -54,7 +60,7 @@ DEBUG_MODE="true"
 ```bash
 # .env.staging
 HEALTHIE_API_URL="https://staging-api.gethealthie.com/graphql"
-HEALTHIE_API_KEY="staging-api-key"
+HEALTHIE_API_KEY="<your-staging-api-key>"
 CACHE_ENABLED="true"
 CACHE_DURATION_HOURS="6"
 LOG_LEVEL="INFO"
@@ -65,7 +71,7 @@ DEBUG_MODE="false"
 ```bash
 # .env.production
 HEALTHIE_API_URL="https://api.gethealthie.com/graphql"
-HEALTHIE_API_KEY="production-api-key"
+HEALTHIE_API_KEY="<your-production-api-key>"
 CACHE_ENABLED="true"
 CACHE_DURATION_HOURS="24"
 LOG_LEVEL="WARNING"
@@ -156,7 +162,7 @@ authentication_errors:
       - "Verify API key with Healthie support"
       - "Regenerate API key if expired"
     code_examples:
-      - "export HEALTHIE_API_KEY='your-valid-key'"
+      - "export HEALTHIE_API_KEY='<your-actual-api-key>'"
 ```
 
 ### `workflows.yaml` - Workflow Sequences
@@ -282,8 +288,9 @@ export CONFIG_ENVIRONMENT="dev"
 **Development:**
 ```bash
 # Use environment file (not committed to git)
-echo "HEALTHIE_API_KEY=dev-key" >> .env.local
-source .env.local
+cp .env.development.example .env.development
+# Edit .env.development and add your actual API key
+# The .env.development file is gitignored
 ```
 
 **Production:**

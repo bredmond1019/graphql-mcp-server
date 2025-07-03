@@ -7,6 +7,7 @@ in the Healthie API, organized by workflow categories.
 from typing import List, Optional, Dict, Any
 from enum import Enum
 from pydantic import BaseModel, Field
+from mcp.server.fastmcp import FastMCP
 
 from ..models.query_templates import QueryTemplatesResult, QueryTemplate, WorkflowCategory
 from ..base import BaseTool, SchemaManagerProtocol
@@ -266,7 +267,7 @@ class QueryTemplatesTool(BaseTool[QueryTemplatesResult]):
         return QueryTemplateConstants.TEMPLATE_TIPS
 
 
-def setup_query_templates_tool(mcp, schema_manager) -> None:
+def setup_query_templates_tool(mcp: FastMCP, schema_manager) -> None:
     """Set up the query templates tool.
     
     Args:
@@ -276,10 +277,10 @@ def setup_query_templates_tool(mcp, schema_manager) -> None:
     tool = QueryTemplatesTool(schema_manager)
     
     @mcp.tool()
-    async def query_templates(
+    def query_templates(
         workflow: Optional[str] = None,
         include_variables: bool = True
-    ) -> QueryTemplatesResult:
+    ) -> dict:
         """Get pre-built GraphQL queries and mutations for common Healthie operations.
         
         Args:
@@ -289,4 +290,6 @@ def setup_query_templates_tool(mcp, schema_manager) -> None:
         Returns:
             QueryTemplatesResult containing the templates
         """
-        return tool.execute(workflow=workflow, include_variables=include_variables)
+        input_data = QueryTemplatesInput(workflow=workflow, include_variables=include_variables)
+        result = tool.execute(input_data)
+        return result.model_dump()

@@ -45,7 +45,7 @@ configuration_items:
       required: true
       description: "API key for Healthie authentication"
       pattern: "^.{10,}$"
-      example: "your_api_key_here"
+      example: "<your-api-key>"
       security_sensitive: true
       
   network:

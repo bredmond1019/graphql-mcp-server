@@ -20,11 +20,21 @@ uv sync
 ## 2. Basic Setup
 
 ```bash
+# Copy the example environment file
+cp .env.development.example .env.development
+
+# Edit .env.development and add your actual Healthie API key
+# The file is gitignored for security
+```
+
+Or manually set environment variables:
+
+```bash
 # Set required environment variables
 export HEALTHIE_API_URL="https://staging-api.gethealthie.com/graphql"
 
 # Optional: Add your Healthie API key for schema downloads
-export HEALTHIE_API_KEY="your-api-key-here"
+export HEALTHIE_API_KEY="<your-actual-api-key>"
 ```
 
 ## 3. Test the Server

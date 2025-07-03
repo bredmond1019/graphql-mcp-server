@@ -2,6 +2,18 @@
 
 *Generated on: 2025-07-03 00:45:00*
 
+## ⚠️ **SECURITY WARNING**
+
+**🔒 NEVER expose signing secrets in production!** All `signing_secret` values in this documentation are placeholders marked as `[GENERATED_SECURELY_DO_NOT_EXPOSE]`. The actual tool generates cryptographically secure secrets that must be:
+
+- ✅ Stored securely (environment variables, secret managers)
+- ✅ Never committed to version control
+- ✅ Rotated regularly (every 90 days)  
+- ✅ Transmitted only over secure channels
+- ❌ Never logged or displayed in plain text
+
+For HIPAA compliance, treat signing secrets as PHI-level security.
+
 ## Tool Overview
 
 The Webhook Configurator helps set up secure webhooks for real-time event notifications from the Healthie platform. It provides endpoint validation, security configuration, event mapping, and HIPAA-compliant setup guidance.
@@ -57,7 +69,7 @@ result = configurator.process_action()
   "events": ["patient.created", "appointment.updated", "payment.completed"],
   "security_level": "hipaa_compliant",
   "custom_headers": {
-    "X-API-Key": "webhook_api_key_123"
+    "X-API-Key": "[YOUR_API_KEY_HERE]"
   }
 }
 ```
@@ -71,7 +83,7 @@ result = configurator.process_action()
     "name": "Webhook for General Events",
     "endpoint_url": "https://api.example.com/webhooks/healthie",
     "security": {
-      "signing_secret": "whsec_Q2x5M3p6N2s5bTJuNHY3eDlxMmI0bjZtOQ==",
+      "signing_secret": "[GENERATED_SECURELY_DO_NOT_EXPOSE]",
       "signature_header": "X-Healthie-Signature",
       "timestamp_header": "X-Healthie-Timestamp",
       "timestamp_tolerance_seconds": 120,
@@ -103,12 +115,12 @@ result = configurator.process_action()
     "active": true,
     "description": "Webhook configuration for hipaa_compliant security level",
     "custom_headers": {
-      "X-API-Key": "webhook_api_key_123"
+      "X-API-Key": "[YOUR_API_KEY_HERE]"
     }
   },
   "security_config": {
-    "signing_secret": "whsec_Q2x5M3p6N2s5bTJuNHY3eDlxMmI0bjZtOQ==",
-    "verification_example": "const crypto = require('crypto');\n\nfunction verifyWebhookSignature(payload, signature, timestamp, secret) {\n  const message = `${timestamp}.${JSON.stringify(payload)}`;\n  const expectedSignature = crypto\n    .createHmac('sha256', secret)\n    .update(message)\n    .digest('hex');\n  \n  return `sha256=${expectedSignature}` === signature;\n}",
+    "signing_secret": "[GENERATED_SECURELY_DO_NOT_EXPOSE]",
+    "verification_example": "const crypto = require('crypto');\n\n// WARNING: Store the 'secret' parameter securely (env vars, secret managers)\n// NEVER hardcode signing secrets in your application code!\nfunction verifyWebhookSignature(payload, signature, timestamp, secret) {\n  const message = `${timestamp}.${JSON.stringify(payload)}`;\n  const expectedSignature = crypto\n    .createHmac('sha256', secret)\n    .update(message)\n    .digest('hex');\n  \n  return `sha256=${expectedSignature}` === signature;\n}",
     "security_level": "HIPAA Compliant",
     "audit_requirements": [
       "Log all webhook deliveries with timestamp",
@@ -387,7 +399,7 @@ result = configurator.process_action()
 {
   "action_performed": "generate_security",
   "security_config": {
-    "signing_secret": "whsec_7k9m2n4v7x9q2b4n6m8p3s5w7y2d4f6h",
+    "signing_secret": "[GENERATED_SECURELY_DO_NOT_EXPOSE]",
     "signature_header": "X-Healthie-Signature",
     "timestamp_header": "X-Healthie-Timestamp",
     "timestamp_tolerance_seconds": 180,
@@ -527,11 +539,22 @@ result = configurator.process_action()
 
 ## Best Practices
 
-1. **Always verify signatures**: Never trust webhook data without verification
-2. **Return 200 quickly**: Process webhooks asynchronously
-3. **Implement idempotency**: Handle duplicate webhooks gracefully
-4. **Store raw payloads**: Keep original data for debugging
-5. **Monitor delivery**: Track success rates and failures
-6. **Use HTTPS only**: Never accept webhooks over HTTP
-7. **Implement retries**: Handle transient failures
-8. **Audit everything**: Log all webhook activity for compliance
+### 🔐 **Security First**
+1. **SECURE SECRETS**: Store signing secrets in environment variables or secret managers, NEVER in code
+2. **Always verify signatures**: Never trust webhook data without verification
+3. **Rotate secrets regularly**: Change signing secrets every 90 days minimum
+4. **Use HTTPS only**: Never accept webhooks over HTTP
+5. **Monitor for anomalies**: Track unusual patterns or failed verifications
+
+### 🚀 **Performance & Reliability**
+6. **Return 200 quickly**: Process webhooks asynchronously
+7. **Implement idempotency**: Handle duplicate webhooks gracefully
+8. **Implement retries**: Handle transient failures
+9. **Store raw payloads**: Keep original data for debugging
+10. **Monitor delivery**: Track success rates and failures
+
+### 📋 **Compliance & Auditing**
+11. **Audit everything**: Log all webhook activity for compliance
+12. **PHI handling**: Treat webhook data containing PHI with appropriate security
+13. **Data retention**: Follow healthcare data retention requirements
+14. **Access controls**: Limit who can access webhook configurations and logs

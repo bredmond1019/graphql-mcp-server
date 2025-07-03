@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from urllib.parse import urlparse
 from mcp.server.fastmcp import FastMCP
-from ..models.webhook_configurator import (
+from ...models.webhook_configurator import (
     WebhookConfiguratorInput, WebhookConfiguratorResult, ValidationResult,
     WebhookEvent, SecurityLevel, WebhookSecurity, EventFilter,
     WebhookConfiguration, PayloadExample

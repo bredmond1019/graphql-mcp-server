@@ -5,7 +5,7 @@ import time
 import httpx
 from typing import List, Optional, Dict, Any
 from mcp.server.fastmcp import FastMCP
-from ..models.integration_testing import (
+from ...models.integration_testing import (
     IntegrationTestInput, IntegrationTestingResult, IntegrationTestReport,
     TestResult, TestCategory, TestSeverity
 )

@@ -3,7 +3,7 @@
 import re
 from typing import Dict, Any, List, Optional, Literal
 from mcp.server.fastmcp import FastMCP
-from src.healthie_mcp.models.environment_manager import (
+from ...models.environment_manager import (
     EnvironmentManagerResult,
     ValidationResult,
     DeploymentStep,
@@ -12,8 +12,8 @@ from src.healthie_mcp.models.environment_manager import (
     ConfigurationItem,
     SecuritySetting
 )
-from src.healthie_mcp.base import BaseTool, SchemaManagerProtocol
-from src.healthie_mcp.exceptions import ToolError
+from ...base import BaseTool, SchemaManagerProtocol
+from ...exceptions import ToolError
 
 
 class EnvironmentManager(BaseTool[EnvironmentManagerResult]):

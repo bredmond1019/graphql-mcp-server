@@ -9,12 +9,12 @@ from typing import List, Dict, Any, Set, Optional
 from enum import Enum
 from pydantic import BaseModel, Field
 
-from ..models.external_dev_tools import (
+from ...models.external_dev_tools import (
     QueryPerformanceResult, PerformanceIssue
 )
-from ..base import BaseTool, SchemaManagerProtocol
-from ..config.loader import get_config_loader
-from ..exceptions import ToolError
+from ...base import BaseTool, SchemaManagerProtocol
+from ...config.loader import get_config_loader
+from ...exceptions import ToolError
 
 
 class PerformanceConstants:

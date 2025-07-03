@@ -30,7 +30,10 @@ uv run pytest --cov=src/healthie_mcp --cov-report=term-missing
 # Run specific test categories
 uv run pytest -m unit          # Unit tests only
 uv run pytest -m integration   # Integration tests only
+uv run pytest -m e2e           # End-to-end tests only
 uv run pytest -m "not slow"    # Skip slow tests
+uv run pytest -m "not requires_api"   # Skip tests requiring external APIs
+uv run pytest -m "not requires_auth"  # Skip tests requiring authentication
 
 # Run a specific test file
 uv run pytest tests/unit/test_config.py -v
@@ -40,19 +43,66 @@ uv run pytest tests/unit/test_config.py::TestConfig::test_default_configuration 
 
 # Test server startup (useful for debugging)
 uv run python -c "from src.healthie_mcp.server import mcp; print('✅ Server ready')"
+
+# Quick test all 8 working tools
+uv run python misc/test_phase_2_simple.py
+
+# Run comprehensive tool testing
+uv run python misc/test_phase_2_all_tools.py
+
+# Run the main healthie-mcp command
+healthie-mcp
+```
+
+## Project Structure
+
+```
+src/healthie_mcp/
+├── __init__.py
+├── server.py              # FastMCP server entry point
+├── base.py               # Abstract base classes and protocols
+├── exceptions.py         # Custom exception hierarchy
+├── schema_manager.py     # GraphQL schema management
+├── config/
+│   ├── __init__.py
+│   ├── settings.py       # Runtime configuration with Pydantic
+│   ├── loader.py         # YAML configuration loader with caching
+│   └── data/            # 11 YAML configuration files
+├── models/              # Pydantic models for all tools
+│   └── *.py            # One model file per tool
+├── tools/               # 8 working tool implementations
+│   ├── __init__.py
+│   ├── *.py            # One file per working tool
+│   └── todo/           # 8 TODO tool implementations (not integrated)
+└── resources/           # MCP resource implementations
+    └── healthie_schema.py
+
+tests/                   # Comprehensive test suite
+├── unit/               # Unit tests for individual components
+├── integration/        # Integration tests for tool interactions
+└── e2e/               # End-to-end workflow tests
+
+misc/                   # Development utilities
+├── test_phase_2_simple.py      # Quick test for all 8 tools
+├── test_phase_2_all_tools.py   # Comprehensive tool testing
+└── various test scripts
+
+test_results/           # Detailed test execution results
+└── *.md               # One file per tool with examples
+
 ```
 
 ## Architecture Overview
 
 ### Core Components
 
-1. **FastMCP Server** (`server.py`): Entry point using the official Python MCP SDK that registers 16 specialized tools and 2 resources
+1. **FastMCP Server** (`server.py`): Entry point using the official Python MCP SDK that registers 8 working tools and 2 resources
 
 2. **Schema Manager** (`schema_manager.py`): Intelligent GraphQL schema management with automatic downloading, caching, validation, and refresh logic
 
 3. **Configuration System**: Two-tier architecture for maximum flexibility:
    - **Application Settings** (`config/settings.py`): Runtime configuration with Pydantic validation
-   - **Tool Configuration** (`config/data/*.yaml`): 8 YAML files containing tool behavior, templates, patterns, and rules
+   - **Tool Configuration** (`config/data/*.yaml`): 11 YAML files containing tool behavior, templates, patterns, and rules
    - **Configuration Loader** (`config/loader.py`): Cached YAML loading with error handling
 
 4. **Base Architecture** (`base.py`): Abstract base classes and protocols ensuring consistent tool implementation with dependency injection
@@ -68,25 +118,25 @@ All tools follow a consistent pattern:
 - Return structured Pydantic models
 - Configuration-driven behavior through YAML files
 
-### Tool Categories (16 Total)
+### Tool Categories (8 Working + 8 TODO)
 
-**Core Schema Tools** (require valid Healthie schema):
+**Working Tools** (fully implemented and tested):
 - `search_schema`: Advanced regex-based schema search with type filtering and context
-- `introspect_type`: Comprehensive type information with fields, relationships, and metadata
-- `find_healthcare_patterns`: Healthcare workflow pattern detection with FHIR awareness
-
-**External Developer Tools** (configuration-driven, work independently):
-- `query_templates`: Pre-built GraphQL queries organized by healthcare workflows
+- `query_templates`: Pre-built GraphQL queries organized by healthcare workflows  
 - `code_examples`: Multi-language examples (JavaScript, Python, cURL) with authentication
-- `input_validation`: Healthcare-compliant validation with medical identifier support
+- `introspect_type`: Comprehensive type information with fields, relationships, and metadata
 - `error_decoder`: Intelligent error interpretation with healthcare-specific solutions
-- `query_performance`: Performance analysis with healthcare workflow optimization
-- `field_relationships`: Deep schema relationship mapping and usage patterns
+- `compliance_checker`: HIPAA and healthcare compliance validation
 - `workflow_sequences`: Multi-step healthcare workflow guidance and best practices
+- `field_relationships`: Deep schema relationship mapping and usage patterns
+
+**TODO Tools** (in `src/healthie_mcp/tools/todo/`, not yet integrated):
+- `find_healthcare_patterns`: Healthcare workflow pattern detection with FHIR awareness
+- `input_validation`: Healthcare-compliant validation with medical identifier support
+- `query_performance`: Performance analysis with healthcare workflow optimization
 - `field_usage`: Field usage recommendations with healthcare context
 - `integration_testing`: Test generation and validation for API integrations
 - `webhook_configurator`: Webhook setup and configuration guidance
-- `compliance_checker`: HIPAA and healthcare compliance validation
 - `rate_limit_advisor`: API rate limiting guidance and optimization
 - `environment_manager`: Environment configuration and management
 - `api_usage_analytics`: API usage tracking and analytics guidance
@@ -486,9 +536,31 @@ Most types include:
 - `locked`: Prevents modifications
 - `requires_signature`: Signature requirement flag
 
+## Debugging Tips
+
+### Enable Debug Mode
+```bash
+export LOG_LEVEL="DEBUG"
+export DEBUG_MODE="true"
+```
+
+### Common Issues
+1. **Schema Download Fails**: Check `HEALTHIE_API_KEY` is set and valid
+2. **Tool Not Found**: Ensure tool is registered in `server.py`
+3. **YAML Config Errors**: Validate YAML syntax in `config/data/`
+4. **Test Failures**: Run with `-v` flag for verbose output
+
+### Development Workflow
+1. Make changes to tool implementation
+2. Update corresponding YAML configuration if needed
+3. Run specific test: `uv run pytest tests/unit/test_your_tool.py -v`
+4. Test with MCP inspector: `uv run mcp dev src/healthie_mcp/server.py:mcp`
+5. Test all tools: `uv run python misc/test_phase_2_simple.py`
+
 ## Documentation
 
 - **[README.md](README.md)**: Project overview and features
 - **[QUICK_START.md](QUICK_START.md)**: 5-minute setup guide
 - **[DEV_SETUP.md](DEV_SETUP.md)**: Comprehensive development setup
-- **[IMPROVEMENTS.md](IMPROVEMENTS.md)**: Improvements over original Node.js version
+- **[IMPROVEMENTS.md](tasks/IMPROVEMENTS.md)**: Improvements over original Node.js version
+- **[test_results/](test_results/)**: Detailed examples for each tool

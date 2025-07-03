@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Tuple
 
 from mcp.server.fastmcp import FastMCP
-from src.healthie_mcp.base import BaseTool, SchemaManagerProtocol
-from src.healthie_mcp.models.api_usage_analytics import (
+from ...base import BaseTool, SchemaManagerProtocol
+from ...models.api_usage_analytics import (
     ApiUsageAnalyticsInput,
     ApiUsageAnalyticsResult,
     TimeRange,
@@ -18,7 +18,7 @@ from src.healthie_mcp.models.api_usage_analytics import (
     PerformanceMetric,
     AnalyticsReport
 )
-from src.healthie_mcp.config.loader import ConfigLoader
+from ...config.loader import ConfigLoader
 
 
 class ApiUsageAnalyzer(BaseTool[ApiUsageAnalyticsResult]):

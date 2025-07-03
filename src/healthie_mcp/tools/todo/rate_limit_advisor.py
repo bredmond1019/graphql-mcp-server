@@ -2,7 +2,7 @@
 
 from typing import List, Optional, Dict, Any
 from mcp.server.fastmcp import FastMCP
-from ..models.rate_limit_advisor import (
+from ...models.rate_limit_advisor import (
     RateLimitAnalysis,
     UsagePattern,
     UsageForecast,

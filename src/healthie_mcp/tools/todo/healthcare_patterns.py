@@ -2,7 +2,7 @@
 
 from typing import Optional, List, Dict, Any
 from mcp.server.fastmcp import FastMCP
-from ..models.healthcare_patterns import HealthcarePatternsResult, HealthcarePattern, PatternCategory
+from ...models.healthcare_patterns import HealthcarePatternsResult, HealthcarePattern, PatternCategory
 
 
 class HealthcarePatternAnalyzer:

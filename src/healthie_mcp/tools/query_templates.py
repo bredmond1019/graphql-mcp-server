@@ -78,19 +78,21 @@ class QueryTemplatesTool(BaseTool[QueryTemplatesResult]):
     
     def execute(
         self,
-        workflow: Optional[str] = None,
-        include_variables: bool = True
+        input_data: QueryTemplatesInput
     ) -> QueryTemplatesResult:
         """Get query templates for common operations.
         
         Args:
-            workflow: Optional workflow filter
-            include_variables: Whether to include example variables
+            input_data: Input parameters for query template retrieval
             
         Returns:
             QueryTemplatesResult containing the templates
         """
         try:
+            # Extract parameters from input
+            workflow = input_data.workflow
+            include_variables = input_data.include_variables
+            
             # Load templates from configuration
             self._ensure_templates_loaded()
             

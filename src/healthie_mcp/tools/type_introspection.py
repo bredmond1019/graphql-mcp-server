@@ -85,16 +85,18 @@ class TypeIntrospectionTool(BaseTool[TypeIntrospectionResult]):
         """Get the tool description."""
         return "Get detailed information about a specific GraphQL type including fields, relationships, and metadata"
     
-    def execute(self, type_name: str) -> TypeIntrospectionResult:
+    def execute(self, input_data: TypeIntrospectionInput) -> TypeIntrospectionResult:
         """Get detailed information about a specific GraphQL type.
         
         Args:
-            type_name: The name of the GraphQL type to introspect
+            input_data: Input containing the type name to introspect
             
         Returns:
             TypeIntrospectionResult with structured type information
         """
         try:
+            # Extract type_name from input
+            type_name = input_data.type_name
             # Validate inputs
             if not type_name or not type_name.strip():
                 error_type = TypeInfo(

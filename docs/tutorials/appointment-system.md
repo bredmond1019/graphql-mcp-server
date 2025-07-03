@@ -282,6 +282,41 @@ if (data.createAppointment.messages?.length > 0) {
 }
 ```
 
+## Using MCP Tools for Appointments
+
+### Discover Appointment Schema
+
+```python
+# Find all appointment-related operations
+apt_search = search_schema("appointment")
+# Returns 96+ appointment mutations and types
+
+# Get detailed appointment type info
+apt_type = introspect_type("Appointment")
+# Shows all 98 fields with relationships
+```
+
+### Generate Appointment Code
+
+```python
+# Get tested appointment templates
+templates = query_templates(workflow="appointments")
+
+# Generate booking implementation
+booking_code = code_examples(
+    operation="book_appointment",
+    language="javascript"
+)
+```
+
+### Debug Common Issues
+
+```python
+# When you get errors
+error_decoder("Cannot query field 'appointmentDate' on type 'Appointment'")
+# Returns: "Use 'date' instead of 'appointmentDate'"
+```
+
 ## Next Steps
 
 - Implement appointment reminders using Healthie's notification system
@@ -293,3 +328,4 @@ For more details, use the MCP server tools:
 - `query_templates(workflow: "appointments")` - Get pre-built queries
 - `find_healthcare_patterns(category: "appointments")` - Explore appointment patterns
 - `field_relationships(source_type: "Appointment")` - Understand related fields
+- See [Using MCP Tools](./using-mcp-tools.md) for comprehensive examples

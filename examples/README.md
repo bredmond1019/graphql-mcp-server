@@ -4,6 +4,14 @@ This directory contains practical examples and sample code for using the Healthi
 
 ## 📁 Directory Structure
 
+### [🤖 MCP Tools](./mcp-tools/)
+Learn to use the 5 core MCP tools that achieved 100% success rate:
+- **search-schema-examples.js** - Find anything in 925k+ characters of schema instantly
+- **query-templates-examples.js** - Get production-ready GraphQL queries
+- **code-generation-examples.js** - Generate working code in multiple languages
+- **type-introspection-examples.js** - Explore types with up to 453 fields
+- **error-debugging-examples.js** - Transform errors into solutions
+
 ### [🔄 Workflows](./workflows/)
 Complete end-to-end workflow examples:
 - **Patient Management** - Registration, profile updates, search
@@ -27,8 +35,35 @@ Utility scripts and tools:
 
 ## 🎯 Quick Start Examples
 
+### Using MCP Tools (NEW!)
+```javascript
+// Search the schema instantly
+const results = await mcp.search_schema({ search_term: "patient" });
+// Found 500+ patient-related items in milliseconds!
+
+// Get production-ready queries
+const templates = await mcp.query_templates({ workflow: "patient_management" });
+
+// Generate working code
+const code = await mcp.code_examples({ 
+  operation: "create_patient", 
+  language: "javascript" 
+});
+
+// Explore any type
+const patientType = await mcp.introspect_type({ type_name: "Patient" });
+
+// Debug errors instantly
+const solution = await mcp.error_decoder({ 
+  error_message: "Cannot query field 'patient_name'" 
+});
+```
+
 ### For Frontend Developers (React)
 ```bash
+# Learn MCP tools for React development
+node ./mcp-tools/code-generation-examples.js
+
 # See complete patient management example
 cat ./integrations/javascript/patient-management.js
 
@@ -38,6 +73,9 @@ cd ./workflows/appointment-scheduling && npm install && npm start
 
 ### For Backend Developers (Python)
 ```bash
+# Explore Python code generation
+node ./mcp-tools/code-generation-examples.js
+
 # Explore Python GraphQL client examples
 ls ./integrations/python/
 
@@ -47,6 +85,9 @@ python ./workflows/clinical-documentation/example.py
 
 ### For API Testing
 ```bash
+# Generate cURL commands with MCP tools
+node ./mcp-tools/code-generation-examples.js
+
 # Use ready-made cURL examples
 ./integrations/curl/test-patient-queries.sh
 

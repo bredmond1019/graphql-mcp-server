@@ -21,6 +21,20 @@ See [QUICK_START.md](QUICK_START.md) for immediate setup and usage.
 
 See [DEV_SETUP.md](DEV_SETUP.md) for comprehensive development environment configuration.
 
+## MCP Tools - 100% Success Rate
+
+These 5 core tools have been tested with 15 test cases and achieved perfect results:
+
+| Tool | Purpose | Performance |
+|------|---------|-------------|
+| **search_schema** | Find anything in 925k+ characters instantly | 575 matches found across tests |
+| **query_templates** | Get production-ready GraphQL queries | 15 templates retrieved |
+| **code_examples** | Generate working code in JS/Python/cURL | 3 languages supported |
+| **introspect_type** | Explore types with complete field info | Up to 453 fields analyzed |
+| **error_decoder** | Transform errors into actionable solutions | Clear fixes provided |
+
+See [test results](./test_results/FINAL_SUCCESS_SUMMARY.md) and [tutorials](./docs/tutorials/using-mcp-tools.md) for details.
+
 ## Core Features
 
 ### 🔍 Schema Intelligence

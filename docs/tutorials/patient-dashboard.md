@@ -287,6 +287,45 @@ def get_patient_dashboard(patient_id, api_key):
 4. **Security**: Never expose API keys in client-side code
 5. **Accessibility**: Ensure dashboard is keyboard navigable and screen reader friendly
 
+## Using MCP Tools for Patient Dashboards
+
+### Discover Patient Data Structure
+
+```python
+# Explore the Patient type completely
+patient_type = introspect_type("Patient")
+# Shows 100+ fields including relationships
+
+# Find all patient-related queries
+patient_queries = search_schema("patient", type_filter="query")
+# Discovers: patient, patients, patientSearch queries
+```
+
+### Generate Dashboard Components
+
+```python
+# Get patient query templates
+dashboard_templates = query_templates(workflow="patient_management")
+
+# Generate complete dashboard code
+dashboard_code = code_examples(
+    operation="patient_dashboard",
+    language="javascript"
+)
+```
+
+### Handle Dashboard Errors
+
+```python
+# Debug common dashboard issues
+error_decoder("Cannot query field 'metrics' on type 'Patient'")
+# Returns: "Use 'metric_entries' with category filter instead"
+
+# Find related data fields
+relationships = search_schema("patient_id", type_filter="field")
+# Shows all types that reference patients
+```
+
 ## Next Steps
 
 - Add real-time updates with GraphQL subscriptions
@@ -298,3 +337,4 @@ For more advanced features, use the MCP server tools:
 - `query_templates(workflow: "patient_management")` - Get more query examples
 - `field_relationships(source_type: "Patient")` - Explore related data
 - `find_healthcare_patterns(category: "patient_data")` - Discover patterns
+- See [Using MCP Tools](./using-mcp-tools.md) for comprehensive examples

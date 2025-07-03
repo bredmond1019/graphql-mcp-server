@@ -330,6 +330,45 @@ Healthie supports various clinical data categories:
 4. **Standardization**: Use standard medical terminologies when possible
 5. **Error Handling**: Implement robust error handling for clinical operations
 
+## Using MCP Tools for Clinical Integration
+
+### Explore Clinical Schema
+
+```python
+# Find clinical data types and operations
+clinical_search = search_schema("clinical")
+# Discovers: ClinicalNote, ChartingNote, Assessment types
+
+# Understand the ChartingNote structure
+note_type = introspect_type("ChartingNote")
+# Shows fields for SOAP notes, signatures, locks
+```
+
+### Generate Clinical Workflows
+
+```python
+# Get clinical documentation templates
+clinical_templates = query_templates(workflow="clinical_data")
+
+# Generate SOAP note implementation
+soap_code = code_examples(
+    operation="create_clinical_note",
+    language="javascript"
+)
+```
+
+### Validate Clinical Data
+
+```python
+# Debug clinical validation errors
+error_decoder("Field 'signedAt' is read-only")
+# Returns: "Use 'signChartingNote' mutation to sign notes"
+
+# Find medical coding fields
+coding_search = search_schema("icd")
+# Finds: icd10_codes, diagnosis_codes fields
+```
+
 ## Next Steps
 
 - Implement FHIR resource mappings for interoperability
@@ -341,3 +380,4 @@ For advanced clinical features, use the MCP server tools:
 - `find_healthcare_patterns(category: "clinical_data")` - Explore clinical patterns
 - `query_templates(workflow: "clinical_documentation")` - Get clinical query templates
 - `compliance_checker(context: "clinical_data")` - Check HIPAA compliance
+- See [Using MCP Tools](./using-mcp-tools.md) for comprehensive examples

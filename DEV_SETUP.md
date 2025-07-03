@@ -28,14 +28,24 @@ uv run python -c "import healthie_mcp; print('✓ Package installed successfully
 
 ### Environment Variables
 
-Create a `.env` file in the project root:
+Set up your environment variables by copying the example file:
+
+```bash
+# 1. Copy the example environment file
+cp .env.development.example .env.development
+
+# 2. Edit the file and add your actual Healthie API key
+# Note: .env.development is gitignored for security
+```
+
+The `.env.development` file should contain:
 
 ```bash
 # Required - Healthie GraphQL API endpoint
 HEALTHIE_API_URL=https://staging-api.gethealthie.com/graphql
 
-# Optional but recommended for full functionality
-HEALTHIE_API_KEY=your-api-key-here
+# Required - Your actual Healthie API key (not the example)
+HEALTHIE_API_KEY=<your-actual-api-key-here>
 
 # Development settings
 LOG_LEVEL=DEBUG
@@ -52,6 +62,8 @@ MAX_RETRIES=3
 # LOG_LEVEL=INFO
 # DEBUG_MODE=false
 ```
+
+**Important**: Never commit your actual API key. The `.env.development` file is included in `.gitignore` to prevent accidental commits.
 
 ## 2. Development Workflow
 
@@ -700,7 +712,7 @@ DEBUG_ASYNCIO=1 uv run mcp dev src/healthie_mcp/server.py:mcp
 ```bash
 # 1. Set up development environment
 uv sync --dev
-cp .env.example .env  # Configure environment variables
+cp .env.development.example .env.development  # Configure environment variables
 
 # 2. Verify current working tools
 uv run python misc/test_phase_2_simple.py

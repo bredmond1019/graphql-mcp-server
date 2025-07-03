@@ -2,6 +2,7 @@
 
 import re
 from typing import List, Dict, Any, Optional
+from mcp.server.fastmcp import FastMCP
 from ..models.external_dev_tools import (
     ErrorDecodeResult, ErrorSolution
 )
@@ -393,7 +394,7 @@ while (retries < 3) {
                    "handling, logging (without exposing PHI), and user notification procedures.")
 
 
-def setup_error_decoder_tool(mcp, schema_manager: SchemaManagerProtocol):
+def setup_error_decoder_tool(mcp: FastMCP, schema_manager: SchemaManagerProtocol):
     """Setup the error decoder tool."""
     tool = ErrorDecoderTool(schema_manager)
 

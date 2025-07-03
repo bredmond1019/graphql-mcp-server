@@ -1,6 +1,8 @@
 """Code example generator tool for external developers."""
 
 from typing import Optional, List, Dict, Any
+from pydantic import Field
+from mcp.server.fastmcp import FastMCP
 from ..models.external_dev_tools import (
     CodeExampleInput, CodeExampleResult, CodeExample, CodeLanguage
 )
@@ -617,14 +619,13 @@ const makeGraphQLRequest = async (query, variables = {}) => {
 };'''
 
 
-def setup_code_example_tool(mcp, schema_manager: SchemaManagerProtocol):
-    """Setup the code example tool."""
-    tool = CodeExampleTool(schema_manager)
-
-    @mcp.tool(name=tool.get_tool_name())
+def setup_code_examples_tool(mcp: FastMCP, schema_manager) -> None:
+    """Setup the code examples tool with the MCP server."""
+    
+    @mcp.tool()
     def code_examples(
-        operation_name: str,
-        language: Optional[str] = None
+        operation_name: str = Field(description="Name of the GraphQL operation or workflow"),
+        language: Optional[str] = Field(None, description="Specific language to generate (javascript, typescript, python, curl)")
     ) -> dict:
         """Generate working code examples for GraphQL operations in multiple languages.
         
@@ -638,11 +639,11 @@ def setup_code_example_tool(mcp, schema_manager: SchemaManagerProtocol):
         Returns:
             CodeExampleResult with code examples in requested languages
         """
+        tool = CodeExampleTool(schema_manager)
         input_data = CodeExampleInput(
             operation_name=operation_name,
             language=language
         )
-
         result = tool.execute(input_data)
         return result.model_dump()
 

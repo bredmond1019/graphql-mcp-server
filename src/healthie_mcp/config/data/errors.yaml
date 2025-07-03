@@ -12,7 +12,7 @@ error_types:
     solutions:
       - problem: "Invalid or missing API key"
         solution: "Check that your HEALTHIE_API_KEY environment variable is set correctly"
-        code_example: 'headers: { "Authorization": "Bearer your-api-key-here" }'
+        code_example: 'headers: { "Authorization": "Bearer <your-api-key>" }'
       - problem: "Expired API key"
         solution: "Generate a new API key from your Healthie dashboard"
         documentation_link: "https://docs.gethealthie.com/authentication"

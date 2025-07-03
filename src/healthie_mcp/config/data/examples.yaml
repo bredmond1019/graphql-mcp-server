@@ -18,7 +18,7 @@ javascript:
           uri: 'https://api.gethealthie.com/graphql',
           cache: new InMemoryCache(),
           headers: {
-            'Authorization': 'Bearer YOUR_API_KEY'
+            'Authorization': 'Bearer <your-api-key>'
           }
         });
         

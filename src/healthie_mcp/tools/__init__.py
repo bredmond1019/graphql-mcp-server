@@ -7,8 +7,8 @@ from .query_templates import setup_query_templates_tool
 from .code_examples import setup_code_examples_tool
 from .error_decoder import setup_error_decoder_tool
 from .compliance_checker import setup_compliance_checker_tool
-from .workflow_sequences import setup_workflow_sequences_tool
-from .field_relationships import setup_field_relationships_tool
+from .workflow_sequences import setup_workflow_sequence_tool
+from .field_relationships import setup_field_relationship_tool
 
 __all__ = [
     "setup_schema_search_tool",
@@ -17,6 +17,6 @@ __all__ = [
     "setup_code_examples_tool",
     "setup_error_decoder_tool",
     "setup_compliance_checker_tool",
-    "setup_workflow_sequences_tool",
-    "setup_field_relationships_tool"
+    "setup_workflow_sequence_tool",
+    "setup_field_relationship_tool"
 ]

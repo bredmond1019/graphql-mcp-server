@@ -8,6 +8,7 @@ best practices for healthcare application development.
 from typing import Optional, List, Dict, Any
 from enum import Enum
 from pydantic import BaseModel, Field
+from mcp.server.fastmcp import FastMCP
 
 from ..models.external_dev_tools import (
     WorkflowSequenceResult, WorkflowSequence, WorkflowStep, WorkflowCategory
@@ -364,7 +365,7 @@ class WorkflowSequencesTool(BaseTool[WorkflowSequenceResult]):
         return [w for w in workflows if workflow_filter_lower in w.workflow_name.lower()]
 
 
-def setup_workflow_sequence_tool(mcp, schema_manager) -> None:
+def setup_workflow_sequence_tool(mcp: FastMCP, schema_manager) -> None:
     """Setup the workflow sequence builder tool with the MCP server."""
     tool = WorkflowSequencesTool(schema_manager)
     
@@ -372,7 +373,7 @@ def setup_workflow_sequence_tool(mcp, schema_manager) -> None:
     def build_workflow_sequence(
         workflow_name: Optional[str] = None,
         category: Optional[str] = None
-    ) -> WorkflowSequenceResult:
+    ) -> dict:
         """Build step-by-step workflow sequences for complex healthcare operations.
         
         This tool provides multi-step API call sequences for common healthcare workflows,
@@ -385,7 +386,8 @@ def setup_workflow_sequence_tool(mcp, schema_manager) -> None:
         Returns:
             WorkflowSequenceResult with detailed workflow sequences
         """
-        return tool.execute(
+        result = tool.execute(
             workflow_name=workflow_name,
             category=category
         )
+        return result.model_dump()

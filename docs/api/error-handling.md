@@ -97,7 +97,7 @@ python -c "import re; re.compile('your-pattern')"
 curl -I https://staging-api.gethealthie.com/graphql
 
 # Check authentication
-export HEALTHIE_API_KEY="your-key"
+export HEALTHIE_API_KEY="<your-api-key>"
 
 # Use cached schema if available
 export CACHE_ENABLED="true"

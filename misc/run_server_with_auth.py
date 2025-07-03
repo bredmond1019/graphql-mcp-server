@@ -5,7 +5,10 @@ import os
 
 # Set environment variables with correct authentication
 os.environ["HEALTHIE_API_URL"] = "http://localhost:3000/graphql"
-os.environ["HEALTHIE_API_KEY"] = "gh_sbox_KmRjkj8kBMYIN8sql7qEMf2oy47WCfWoTHTDun4k9NrYi1fP9PnFM1m54hITV1Am"
+# API key should be set in environment variables
+# Example: export HEALTHIE_API_KEY="your-api-key"
+if not os.getenv('HEALTHIE_API_KEY'):
+    raise ValueError("HEALTHIE_API_KEY environment variable must be set")
 os.environ["HEALTHIE_AUTH_TYPE"] = "Basic"  # Use Basic instead of Bearer
 os.environ["HEALTHIE_AUTH_SOURCE"] = "API"  # Add AuthorizationSource header
 

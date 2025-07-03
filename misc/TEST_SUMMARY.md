@@ -7,7 +7,7 @@
 - **Solution**: Use `Basic` authentication with `AuthorizationSource: API` header
 - **Working Headers**:
   ```
-  Authorization: Basic gh_sbox_KmRjkj8kBMYIN8sql7qEMf2oy47WCfWoTHTDun4k9NrYi1fP9PnFM1m54hITV1Am
+  Authorization: Basic <API_KEY_FROM_ENV>
   AuthorizationSource: API
   ```
 
@@ -29,9 +29,13 @@
 ```bash
 cd /Users/brandon/Healthie/python-mcp-server
 
-# Set environment variables
+# Option 1: Use environment file
+cp .env.development.example .env.development
+# Edit .env.development and add your actual API key
+
+# Option 2: Set environment variables directly
 export HEALTHIE_API_URL="http://localhost:3000/graphql"
-export HEALTHIE_API_KEY="gh_sbox_KmRjkj8kBMYIN8sql7qEMf2oy47WCfWoTHTDun4k9NrYi1fP9PnFM1m54hITV1Am"
+export HEALTHIE_API_KEY="<your-actual-api-key>"  # Replace with your actual API key
 
 # Launch MCP Inspector
 uv run mcp dev run_server_with_auth.py:mcp

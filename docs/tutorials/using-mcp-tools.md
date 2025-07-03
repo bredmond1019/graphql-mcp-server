@@ -4,13 +4,21 @@ Learn how to leverage the Model Context Protocol (MCP) tools to accelerate your 
 
 ## Overview
 
-The Healthie MCP Server provides 5 core tools that significantly enhance developer productivity:
+The Healthie MCP Server provides 8 core tools that significantly enhance developer productivity:
 
+### Primary Development Tools (5)
 1. **search_schema** - Instantly search through 925k+ characters of GraphQL schema
 2. **query_templates** - Get pre-built, tested GraphQL queries for common workflows
 3. **code_examples** - Generate working code in JavaScript, Python, or cURL
 4. **introspect_type** - Explore type definitions with complete field information
 5. **error_decoder** - Transform cryptic errors into actionable solutions
+
+### Healthcare Specialization Tools (3)
+6. **compliance_checker** - Validate HIPAA compliance and identify PHI exposure
+7. **build_workflow_sequence** - Get step-by-step healthcare workflow guidance
+8. **field_relationships** - Map connections between GraphQL fields
+
+See [Healthcare Specialized Tools](./healthcare-specialized-tools.md) for the additional 3 tools.
 
 ## Benefits
 

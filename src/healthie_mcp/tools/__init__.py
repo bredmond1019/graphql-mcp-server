@@ -1,18 +1,22 @@
 """Tools module for Healthie MCP server."""
 
-# Import setup functions for tools
+# Import setup functions for working tools
 from .schema_search import setup_schema_search_tool
 from .type_introspection import setup_type_introspection_tool
-from .healthcare_patterns import setup_healthcare_patterns_tool
-from .rate_limit_advisor import setup_rate_limit_advisor_tool
-from .environment_manager import setup_environment_manager_tool
-from .api_usage_analytics import setup_api_usage_analytics_tool
+from .query_templates import setup_query_templates_tool
+from .code_examples import setup_code_examples_tool
+from .error_decoder import setup_error_decoder_tool
+from .compliance_checker import setup_compliance_checker_tool
+from .workflow_sequences import setup_workflow_sequences_tool
+from .field_relationships import setup_field_relationships_tool
 
 __all__ = [
     "setup_schema_search_tool",
-    "setup_type_introspection_tool", 
-    "setup_healthcare_patterns_tool",
-    "setup_rate_limit_advisor_tool",
-    "setup_environment_manager_tool",
-    "setup_api_usage_analytics_tool"
+    "setup_type_introspection_tool",
+    "setup_query_templates_tool",
+    "setup_code_examples_tool",
+    "setup_error_decoder_tool",
+    "setup_compliance_checker_tool",
+    "setup_workflow_sequences_tool",
+    "setup_field_relationships_tool"
 ]

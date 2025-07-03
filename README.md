@@ -65,7 +65,7 @@ Want even more power? Enable 9 additional tools with `HEALTHIE_ENABLE_ADDITIONAL
 ### 1. Install & Setup (2 minutes)
 ```bash
 # Clone and install
-git clone <repository-url>
+git clone https://github.com/bredmond1019/graphql-mcp-server
 cd python-mcp-server
 uv sync
 
